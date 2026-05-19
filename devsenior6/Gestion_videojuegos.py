@@ -1,295 +1,104 @@
-
-# PROYECTO FINAL - MoDULO 3: SISTEMA DE GESTIoN DE TIENDA DE VIDEOJUEGOS
-
-# Docente: [Tu Nombre como Profesor]
-# Fecha: [Fecha Actual]
-# Nivel: Intermedio
-# Tiempo Estimado: 2-3 horas
-
-
-
-# 1. OBJETIVO GENERAL DEL PROYECTO
-
 """
-Desarrollar un programa completo en Python que permita administrar el inventario
-y las ventas de una tienda de videojuegos. Este proyecto integrador tiene como
-meta aplicar de manera práctica todos los conceptos aprendidos en el modulo 3:
-
-✓ Variables y tipos de datos
-✓ Condicionales (if, elif, else)
-✓ Ciclos (while, for)
-✓ Funciones con parámetros y retorno
-✓ Colecciones (diccionarios y listas)
-✓ Validacion de datos
-✓ Cálculos básicos
-
-El resultado final será un sistema de consola completamente funcional que
-demuestre el dominio de los fundamentos de Python.
-"""
+Ejercicio Integrador en Python
+Sistema de Gestión de una Tienda de Videojuegos
+Objetivo
+Desarrollar un programa en Python que permita administrar el inventario y las ventas de una tienda de videojuegos utilizando:
+Variables
+Condicionales (if, elif, else)
+Ciclos (while, for)
+Funciones
+Colecciones (diccionarios y listas)
 
 
-# 2. CONTEXTO Y ANÁLISIS DEL PROBLEMA
-
-"""
-CONTEXTO EMPRESARIAL:
-Una tienda de videojuegos necesita un sistema informático para gestionar su
-inventario y controlar las ventas diarias. Actualmente, toda la gestion se
-realiza manualmente, lo que genera errores, pérdida de tiempo y dificultades
-para obtener estadisticas de ventas.
-
-PROBLEMA A RESOLVER:
-- Controlar el inventario de videojuegos de manera automática
-- Gestionar ventas con validaciones de stock
-- Generar reportes y estadisticas de negocio
-- Mantener la integridad de los datos
-
-ESTRUCTURA DE DATOS PRINCIPAL:
-Cada videojuego se representa como un diccionario anidado con la siguiente
-informacion esencial para el negocio:
-"""
+Enunciado del Problema
+Una tienda de videojuegos desea llevar el control de sus productos y ventas.
+Cada videojuego tendrá la siguiente información:
+Código
+Nombre
+Plataforma (PC, PlayStation, Xbox, Nintendo)
+Precio
+Cantidad en inventario
+La información se almacenará en un diccionario con la siguiente estructura:
+Python
 
 
-# 3. ESPECIFICACIONES TÉCNICAS - ESTRUCTURA DE DATOS
-
-# Modelo de datos para cada videojuego
-# videojuego_modelo = {
-#     "codigo": "VG001",           # Identificador único (string)
-#     "nombre": "FIFA 26",         # Nombre del juego (string)
-#     "plataforma": "PlayStation 5", # Plataforma (string)
-#     "precio": 250000,            # Precio en pesos (int/float)
-#     "cantidad": 10               # Unidades disponibles (int)
-# }
+videojuegos = {
+    "VG001": {
+        "nombre": "FIFA 26",
+        "plataforma": "PlayStation 5",
+        "precio": 250000,
+        "cantidad": 10
+    }
+}
 
 
-# 4. ENUNCIADO DETALLADO DEL PROYECTO
-
-"""
-DESARROLLAR UN SISTEMA DE GESTIoN que permita a la tienda de videojuegos:
-
-1. ADMINISTRAR INVENTARIO:
-   - Agregar nuevos videojuegos al catálogo
-   - Consultar el inventario completo
-   - Buscar productos especificos
-   - Actualizar precios
-   - Eliminar productos obsoletos
-
-2. GESTIONAR VENTAS:
-   - Registrar ventas con validacion de stock
-   - Generar facturas automáticas
-   - Controlar inventario en tiempo real
-
-3. OBTENER ESTADiSTICAS:
-   - Reportes de inventario
-   - Análisis de precios y stock
-   - Métricas de negocio
-
-El sistema debe funcionar a través de un menú interactivo que permita al
-usuario navegar entre las diferentes opciones de manera intuitiva.
-"""
-
-
-# 5. INTERFAZ DE USUARIO - MENÚ PRINCIPAL
-
-"""
-El programa debe mostrar repetidamente el siguiente menú hasta que el usuario
-elija salir:
-
+Menú Principal
+El programa debe mostrar repetidamente el siguiente menú:
+Plain text
 ===== TIENDA DE VIDEOJUEGOS =====
 1. Agregar videojuego
 2. Mostrar inventario
-3. Buscar videojuego por codigo
+3. Buscar videojuego por código
 4. Actualizar precio
 5. Registrar venta
-6. Mostrar estadisticas
+6. Mostrar estadísticas
 7. Eliminar videojuego
 8. Salir
 
-Seleccione una opcion (1-8): _
-"""
+
+Requisitos del Programa
+1. Agregar videojuego
+Crear una función que solicite los datos del videojuego y lo agregue al diccionario.
+Validaciones:
+No se debe permitir un código repetido.
+El precio y la cantidad deben ser mayores que cero.
+2. Mostrar inventario
+Recorrer el diccionario e imprimir todos los videojuegos registrados.
+3. Buscar videojuego por código
+Solicitar un código y mostrar toda la información del videojuego si existe.
+4. Actualizar precio
+Permitir cambiar el precio de un videojuego existente.
+5. Registrar venta
+Solicitar:
+Código del videojuego
+Cantidad a vender
+Validaciones:
+El videojuego debe existir.
+Debe haber suficiente inventario.
+Acciones:
+Restar del inventario.
+Calcular el valor total de la venta.
+Mostrar factura.
+6. Mostrar estadísticas
+Crear una función que muestre:
+Total de videojuegos registrados.
+Valor total del inventario.
+Videojuego más costoso.
+Videojuego con mayor cantidad disponible.
+Promedio de precios.
+7. Eliminar videojuego
+Eliminar un videojuego por código.
+8. Salir
+Finalizar el programa.
+Requisitos Técnicos
+Funciones obligatorias
+Debes implementar al menos las siguientes funciones:
+Python
 
 
-# 6. REQUISITOS FUNCIONALES DETALLADOS
-
-"""
-Cada opcion del menú debe implementar las siguientes funcionalidades:
-"""
-
-# 6.1 AGREGAR VIDEOJUEGO
-"""
-Funcion: agregar_videojuego(videojuegos)
-Descripcion: Solicita datos al usuario y agrega un nuevo videojuego al inventario
-
-ENTRADAS (input del usuario):
-- Codigo del videojuego
-- Nombre del juego
-- Plataforma
-- Precio
-- Cantidad inicial
-
-VALIDACIONES REQUERIDAS:
-✓ Codigo único (no debe existir en el diccionario)
-✓ Precio > 0
-✓ Cantidad >= 0
-✓ Nombre y plataforma no vacios
-
-SALIDA:
-- Mensaje de confirmacion si se agrega correctamente
-- Mensaje de error si hay validaciones fallidas
-"""
-
-# 6.2 MOSTRAR INVENTARIO
-"""
-Funcion: mostrar_inventario(videojuegos)
-Descripcion: Muestra todos los videojuegos registrados en formato tabular
-
-ENTRADAS:
-- Diccionario de videojuegos
-
-SALIDA:
-- Lista formateada con todos los productos
-- Mensaje especial si el inventario está vacio
-"""
-
-# 6.3 BUSCAR VIDEOJUEGO POR CoDIGO
-"""
-Funcion: buscar_videojuego(videojuegos)
-Descripcion: Busca y muestra la informacion completa de un videojuego
-
-ENTRADAS:
-- Codigo del videojuego a buscar
-
-SALIDA:
-- Informacion completa del producto si existe
-- Mensaje de "no encontrado" si no existe
-"""
-
-# 6.4 ACTUALIZAR PRECIO
-"""
-Funcion: actualizar_precio(videojuegos)
-Descripcion: Permite modificar el precio de un videojuego existente
-
-ENTRADAS:
-- Codigo del videojuego
-- Nuevo precio
-
-VALIDACIONES:
-✓ El videojuego debe existir
-✓ Nuevo precio > 0
-
-SALIDA:
-- Confirmacion de actualizacion exitosa
-"""
-
-# 6.5 REGISTRAR VENTA
-"""
-Funcion: registrar_venta(videojuegos)
-Descripcion: Procesa una venta y actualiza el inventario
-
-ENTRADAS:
-- Codigo del videojuego
-- Cantidad a vender
-
-VALIDACIONES:
-✓ El videojuego debe existir
-✓ Cantidad disponible >= cantidad solicitada
-✓ Cantidad a vender > 0
-
-ACCIONES:
-- Restar cantidad del inventario
-- Calcular total de la venta
-- Mostrar factura detallada
-
-SALIDA:
-Factura con:
-- Nombre del juego
-- Precio unitario
-- Cantidad vendida
-- Total a pagar
-"""
-
-# 6.6 MOSTRAR ESTADiSTICAS
-"""
-Funcion: mostrar_estadisticas(videojuegos)
-Descripcion: Genera reportes estadisticos del inventario
-
-MÉTRICAS A CALCULAR:
-✓ Total de videojuegos registrados
-✓ Valor total del inventario (suma de precio * cantidad)
-✓ Videojuego más costoso
-✓ Videojuego con mayor cantidad disponible
-✓ Promedio de precios de todos los juegos
-
-SALIDA:
-- Reporte formateado con todas las estadisticas
-"""
-
-# 6.7 ELIMINAR VIDEOJUEGO
-"""
-Funcion: eliminar_videojuego(videojuegos)
-Descripcion: Remueve un videojuego del inventario
-
-ENTRADAS:
-- Codigo del videojuego a eliminar
-
-VALIDACIONES:
-✓ El videojuego debe existir
-
-SALIDA:
-- Confirmacion de eliminacion
-- Mensaje de error si no existe
-"""
-
-# 6.8 SALIR
-"""
-Funcion: menu() debe terminar el programa
-Descripcion: Finaliza la ejecucion del programa
-"""
-
-
-# 7. REQUISITOS TÉCNICOS OBLIGATORIOS
-
-"""
-FUNCIONES QUE DEBES IMPLEMENTAR (minimo obligatorio):
-
-def agregar_videojuego(videojuegos: dict) -> None:
-    pass
-
-def mostrar_inventario(videojuegos: dict) -> None:
-    pass
-
-def buscar_videojuego(videojuegos: dict) -> None:
-    pass
-
-def actualizar_precio(videojuegos: dict) -> None:
-    pass
-
-def registrar_venta(videojuegos: dict) -> None:
-    pass
-
-def mostrar_estadisticas(videojuegos: dict) -> None:
-    pass
-
-def eliminar_videojuego(videojuegos: dict) -> None:
-    pass
-
-def menu() -> None:
-    pass
-
-RECOMENDACIONES DE IMPLEMENTACIoN:
-- Usa funciones puras cuando sea posible
-- Implementa validaciones robustas
-- Maneja errores de manera elegante
-- Usa nombres descriptivos para variables y funciones
-- Comenta tu codigo adecuadamente
-"""
-
-
-# 8. DATOS DE PRUEBA INICIALES
-
-"""
-Para facilitar las pruebas, inicia tu programa con este diccionario:
-"""
-videojuegos_iniciales = {
+def agregar_videojuego(videojuegos):
+def mostrar_inventario(videojuegos):
+def buscar_videojuego(videojuegos):
+def actualizar_precio(videojuegos):
+def registrar_venta(videojuegos):
+def mostrar_estadisticas(videojuegos):
+def eliminar_videojuego(videojuegos):
+def menu():
+    
+    
+Datos Iniciales de Prueba
+Python
+videojuegos = {
     "VG001": {
         "nombre": "FIFA 26",
         "plataforma": "PlayStation 5",
@@ -311,220 +120,62 @@ videojuegos_iniciales = {
 }
 
 
-# 9. EJEMPLOS DE EJECUCIoN
+Ejemplo de Venta
+Plain text
+Ingrese código del videojuego: VG001
+Ingrese cantidad a vender: 2
 
-"""
-EJEMPLO 1: Agregar un videojuego
-=====================================
-Codigo: VG004
-Nombre: God of War Ragnarök
-Plataforma: PlayStation 5
-Precio: 280000
-Cantidad: 12
-
-Resultado: "Videojuego agregado exitosamente"
-
-EJEMPLO 2: Registrar una venta
-=====================================
-Codigo del videojuego: VG001
-Cantidad a vender: 2
-
-Resultado - Factura:
-==================
+Factura:
 Juego: FIFA 26
-Precio unitario: $250,000
+Precio unitario: $250000
 Cantidad: 2
-Total: $500,000
-==================
-¡Venta registrada exitosamente!
-
-EJEMPLO 3: Mostrar estadisticas
-=====================================
-Estadisticas del Inventario:
------------------------------
-Total de videojuegos: 3
-Valor total del inventario: $6,950,000
-Videojuego más costoso: FIFA 26 ($250,000)
-Mayor cantidad disponible: FIFA 26 (10 unidades)
-Promedio de precios: $230,000
-"""
-
-
-# 10. RETOS ADICIONALES (OPCIONALES - PARA NIVEL AVANZADO)
-
-"""
-Si completas el proyecto básico antes del tiempo estimado, implementa estas
-funcionalidades adicionales:
-
-🔹 BÚSQUEDA AVANZADA:
-- Buscar videojuegos por plataforma
-- Buscar videojuegos por rango de precios
-
-🔹 ALERTAS DE INVENTARIO:
-- Mostrar videojuegos con inventario bajo (cantidad < 3)
-- Alertas automáticas al registrar ventas
-
-🔹 DESCUENTOS INTELIGENTES:
-- Aplicar 10% de descuento en ventas mayores a $500.000
-- Descuentos por cantidad (3x2, etc.)
-
-🔹 HISTORIAL DE VENTAS:
-- Guardar todas las ventas en una lista de diccionarios
-- Mostrar historial completo de ventas
-- Calcular videojuego más vendido
-
-🔹 EXPORTACIoN DE DATOS:
-- Guardar inventario en archivo JSON
-- Generar reportes en formato texto
-"""
-
-
-# 11. CONCEPTOS FUNDAMENTALES QUE PRACTICARÁS
-
-"""
-Este proyecto te permitirá demostrar dominio de:
-
-📊 ESTRUCTURAS DE DATOS:
-- Diccionarios anidados
-- Listas para almacenamiento temporal
-- Manipulacion de colecciones
-
-🔧 FUNCIONES Y MODULARIDAD:
-- Funciones con parámetros y retorno
-- Separacion de responsabilidades
-- Reutilizacion de codigo
-
-⚡ CONTROL DE FLUJO:
-- Condicionales (if/elif/else)
-- Ciclos while para menús
-- Ciclos for para iteracion
-
-✅ VALIDACIoN Y MANEJO DE ERRORES:
-- Validacion de entrada de usuario
-- Manejo de casos edge
-- Mensajes de error informativos
-
-📈 LoGICA DE NEGOCIO:
-- Cálculos matemáticos (totales, promedios)
-- Logica condicional compleja
-- Algoritmos de búsqueda y filtrado
-"""
-
-
-# 12. CRITERIOS DE EVALUACIoN
-
-"""
-El proyecto será evaluado según:
-
-✅ FUNCIONALIDAD (60%):
-- Todas las funciones implementadas correctamente
-- Validaciones funcionando
-- Menú operativo
-
-✅ CoDIGO (25%):
-- Legibilidad y organizacion
-- Comentarios adecuados
-- Nombres descriptivos
-- Estructura modular
-
-✅ VALIDACIONES (10%):
-- Manejo correcto de errores
-- Mensajes informativos
-- Casos edge considerados
-
-✅ CREATIVIDAD (5%):
-- Funcionalidades adicionales implementadas
-- Interfaz de usuario mejorada
-"""
-
-
-# 13. ENTREGA Y PRESENTACIoN
-
-"""
-INSTRUCCIONES DE ENTREGA:
-1. El codigo debe estar bien comentado
-2. Incluir datos de prueba iniciales
-3. El programa debe ejecutarse sin errores
-4. Demostrar todas las funcionalidades en funcionamiento
-
-ARCHIVO A ENTREGAR:
-- PROYECTOFINALmodulo3.py (codigo completo)
-- Documentacion breve de las decisiones tomadas
-
-TIEMPO DE PRESENTACIoN:
-- 5 minutos explicando la logica implementada
-- 5 minutos demostrando funcionalidades
-- 5 minutos respondiendo preguntas del docente
-"""
-
-
-# 14. RECOMENDACIONES PARA EL DESARROLLO
-
-"""
-CONSEJOS PARA UN DESARROLLO EXITOSO:
-
-1. PLANIFICACIoN:
-   - Lee todo el enunciado antes de empezar
-   - Diseña la estructura de funciones primero
-   - Identifica las validaciones necesarias
-
-2. DESARROLLO POR PARTES:
-   - Implementa funcion por funcion
-   - Prueba cada funcion individualmente
-   - Integra gradualmente al menú principal
-
-3. TESTING:
-   - Prueba casos normales y casos edge
-   - Verifica validaciones con datos inválidos
-   - Confirma cálculos matemáticos
-
-4. DEPURACIoN:
-   - Usa print() temporales para debugging
-   - Verifica tipos de datos
-   - Revisa logica condicional
-
-5. MEJORAS FINALES:
-   - Limpia codigo no utilizado
-   - Mejora mensajes al usuario
-   - Agrega comentarios finales
-"""
-
-
-# ¡ÉXITO EN TU PROYECTO FINAL!
-
-"""
-Recuerda: este proyecto es tu oportunidad de demostrar todo lo aprendido.
-Tomate tu tiempo, planifica bien, y disfruta el proceso de creacion.
-
-Si tienes dudas durante el desarrollo, no dudes en consultar con tu docente.
-
-¡Mucho éxito! 🚀
+Total: $500000
+Retos Adicionales (Opcionales)
+Si terminas antes, agrega:
+Buscar videojuegos por plataforma.
+Mostrar videojuegos con inventario bajo (cantidad < 3).
+Aplicar descuentos del 10% en ventas mayores a $500.000.
+Guardar historial de ventas en una lista.
+Mostrar el videojuego más vendido.
+Conceptos que Practicarás
+Diccionarios anidados
+Listas
+Funciones con parámetros y retorno
+Condicionales
+Ciclos while y for
+Validación de datos
+Cálculos estadísticos básicos
+Nivel de Dificultad
+Intermedio
+Tiempo Estimado
+2 a 3 horas
+Resultado Esperado
+Al finalizar tendrás un sistema completo de consola para administrar una tienda de videojuegos, aplicando de 
+forma práctica los principales fundamentos de Python.
 """
 
 
 # PROYECTO FINAL - MoDULO 3
 # SISTEMA DE GESTIoN DE TIENDA DE VIDEOJUEGOS
-
-
 # DICCIONARIO PRINCIPAL DEL INVENTARIO
 
 videojuegos = {
 
-    "videoJuego001": {
+    "VG001": {
         "nombre": "FIFA 26",
         "plataforma": "PlayStation 5",
         "precio": 250000,
         "cantidad": 10
     },
 
-    "videoJuego002": {
+    "VG002": {
         "nombre": "Zelda: Breath of the Wild",
         "plataforma": "Nintendo Switch",
         "precio": 220000,
         "cantidad": 5
     },
 
-    "videoJuego003": {
+    "VG003": {
         "nombre": "Forza Horizon 5",
         "plataforma": "Xbox Series X",
         "precio": 210000,
@@ -538,20 +189,17 @@ historial_ventas = []
 
 
 # FUNCIoN PARA VALIDAR NÚMEROS
-
 def validar_numero(numero):
     if numero.replace(".", "", 1).isdigit():
         return True
     else:
         return False
 
-
-
 # FUNCIoN: AGREGAR VIDEOJUEGO
 def agregar_videojuego(videojuegos):
-
     print("\n-------- AGREGAR VIDEOJUEGO --------")
     codigo = input("Ingrese el codigo del videojuego: ").upper()
+
     if codigo == "":
         print("El codigo no puede estar vacio")
         return
@@ -561,16 +209,19 @@ def agregar_videojuego(videojuegos):
         return
 
     nombre = input("Ingrese el nombre del videojuego: ")
+    
     if nombre == "":
         print("El nombre no puede estar vacio")
         return
 
     plataforma = input("Ingrese la plataforma: ")
+    
     if plataforma == "":
         print("La plataforma no puede estar vacia")
         return
 
     precio = input("Ingrese el precio: ")
+    
     if validar_numero(precio) == False:
         print("El precio debe ser numérico")
         return
@@ -631,6 +282,7 @@ def mostrar_inventario(videojuegos):
 def buscar_videojuego(videojuegos):
 
     print("\n----- BUSCAR VIDEOJUEGO -----")
+    
     codigo = input("Ingrese el codigo del videojuego: ").upper()
 
     if codigo in videojuegos:
@@ -651,6 +303,7 @@ def buscar_videojuego(videojuegos):
 def actualizar_precio(videojuegos):
 
     print("\n-------- ACTUALIZAR PRECIO --------")
+    
     codigo = input("Ingrese el codigo del videojuego: ").upper()
 
     if codigo not in videojuegos:
@@ -744,7 +397,7 @@ def registrar_venta(videojuegos):
     print("Venta registrada exitosamente")
 
     if videojuegos[codigo]["cantidad"] < 3:
-        print("⚠ ALERTA: Inventario bajo")
+        print("ALERTA: Inventario bajo")
 
 
 
@@ -832,7 +485,7 @@ def mostrar_historial_ventas():
     print("\n-------- HISTORIAL DE VENTAS --------")
 
     if len(historial_ventas) == 0:
-        print("❌ No hay ventas registradas")
+        print("No hay ventas registradas")
         return
 
     for venta in historial_ventas:

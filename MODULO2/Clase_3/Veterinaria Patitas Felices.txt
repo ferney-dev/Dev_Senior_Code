@@ -1,0 +1,17 @@
+Veterinaria Patitas Felices**
+>
+> La veterinaria "Patitas Felices" atiende decenas de familias cada semana y hoy lleva todo en cuadernos de papel. El dueño quiere un sistema para ordenar su operación.
+>
+> Cada **cliente** (dueño de mascotas) se registra con su nombre, teléfono y correo. Un mismo cliente puede tener **varias mascotas** — la familia Gómez, por ejemplo, trae a su perro Max, su gata Luna y su conejo Copo.
+>
+> De cada **mascota** necesitan saber su nombre, especie (perro, gato, etc.), raza y fecha de nacimiento, y **de quién es**. Una mascota pertenece a un solo dueño, pero un dueño puede tener muchas.
+>
+> Cuando una mascota se enferma o va a control, se agenda una **cita**. Cada cita tiene fecha, motivo y a **qué mascota** corresponde. Una mascota puede tener muchas citas a lo largo de su vida.
+>
+> A cada cita la atiende un **veterinario** del equipo. Cada veterinario tiene nombre y especialidad, y atiende muchas citas a lo largo del día.
+>
+> En muchas citas se aplica un **tratamiento** a la mascota: una vacuna, una desparasitación, una curación. Cada tipo de tratamiento tiene un nombre y un precio. Pero aquí está lo interesante para el dueño: **cada tratamiento consume insumos del inventario**. Una "Vacuna Triple", por ejemplo, gasta 1 vial de vacuna, 1 jeringa y 2 pares de guantes. Una "Desparasitación" gasta 1 pastilla antiparasitaria y 1 par de guantes.
+>
+> La veterinaria maneja un **inventario de insumos**: viales, jeringas, guantes, pastillas, gasas… de cada uno sabe cuánto tiene en stock. El dueño está cansado de descubrir tarde que se quedó sin jeringas. Quiere que, **cuando se aplique un tratamiento en una cita, el sistema descuente automáticamente los insumos del inventario** — y que si no hay suficiente de algo, **no deje aplicar el tratamiento** y avise.
+>
+> El dueño quiere, con el tiempo, poder consultar cosas como: todas las mascotas de un cliente, el historial de citas de una mascota, cuántas citas atendió cada veterinario en el mes, o qué insumos están por agotarse.

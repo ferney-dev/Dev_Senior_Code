@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clase 3 · Calidad de Datos y Monitoreo de Pipelines</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --morado:#7B3FF2; --vibrante:#9D5BFF; --oscuro:#5418CC;
+  --texto:#ECE7F7; --suave:#1c1430;
+  --blanco:#0f0a1a; --gris:#9b91b8; --gris-claro:#2e2447;
+  --borde:#2c2247; --codigo-bg:#16102a; --codigo-texto:#e9e3ff;
+  --exito:#34d399; --exito-bg:#102b22;
+  --alerta:#fbbf6b; --alerta-bg:#2e2113;
+  --error:#fb7185; --error-bg:#2d141c;
+  --panel:#150f26; --panel-2:#1a1330;
+  --sidebar-w:300px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',sans-serif;color:var(--texto);
+  background:#0a0612;line-height:1.65;font-size:16px;
+  -webkit-font-smoothing:antialiased;
+}
+code,pre,.mono{font-family:'JetBrains Mono',monospace}
+p code,li code,td code{background:#241a40;color:#d9c9ff;padding:1px 6px;border-radius:5px;font-size:.88em}
+
+/* ===== SIDEBAR ===== */
+.sidebar{
+  position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;
+  background:linear-gradient(180deg,var(--oscuro) 0%,var(--morado) 100%);
+  color:#fff;overflow-y:auto;z-index:100;padding:0;
+  transition:transform .3s ease;
+}
+.sidebar-head{padding:28px 24px 20px;border-bottom:1px solid rgba(255,255,255,.13)}
+.sidebar-head .eyebrow{
+  font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  color:#c9b6ff;margin-bottom:8px;
+}
+.sidebar-head h1{font-size:19px;font-weight:800;line-height:1.25;letter-spacing:-.01em}
+.sidebar-head .sub{font-size:12.5px;color:#c9b6ff;margin-top:8px;font-weight:500}
+
+.progress-wrap{padding:16px 24px 8px}
+.progress-label{display:flex;justify-content:space-between;font-size:11px;
+  color:#c9b6ff;font-weight:600;margin-bottom:7px;letter-spacing:.04em}
+.progress-track{height:6px;background:rgba(255,255,255,.16);border-radius:99px;overflow:hidden}
+.progress-bar{height:100%;width:0;background:linear-gradient(90deg,#a888ff,#fff);
+  border-radius:99px;transition:width .35s ease}
+
+.nav{padding:10px 14px 30px;list-style:none}
+.nav li a{
+  display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:9px;
+  color:#e7ddff;text-decoration:none;font-size:13.5px;font-weight:500;
+  transition:background .16s,color .16s;line-height:1.35;
+}
+.nav li a:hover{background:rgba(255,255,255,.1);color:#fff}
+.nav li a.active{background:rgba(255,255,255,.18);color:#fff;font-weight:600}
+.nav .num{
+  flex-shrink:0;width:24px;height:24px;border-radius:7px;
+  background:rgba(255,255,255,.14);display:grid;place-items:center;
+  font-size:11.5px;font-weight:700;font-family:'JetBrains Mono';
+}
+.nav li a.active .num{background:#fff;color:var(--morado)}
+
+/* ===== MAIN ===== */
+.main{margin-left:var(--sidebar-w);max-width:none;background:#0a0612}
+.content{max-width:820px;margin:0 auto;padding:60px 48px 120px}
+.menu-btn{display:none}
+
+section{margin-bottom:56px;scroll-margin-top:30px}
+.block-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;font-size:11.5px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--vibrante);
+  margin-bottom:14px;
+}
+.block-eyebrow .dot{width:7px;height:7px;border-radius:99px;background:var(--vibrante)}
+h2{font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.18;margin-bottom:18px}
+h3{font-size:20px;font-weight:700;letter-spacing:-.01em;margin:32px 0 12px}
+h4{font-size:16px;font-weight:700;margin:22px 0 8px;color:#c9b6ff}
+p{margin-bottom:14px}
+.lead{font-size:18px;color:var(--gris);font-weight:500;margin-bottom:22px;line-height:1.55}
+strong{font-weight:700;color:#d9c9ff}
+ul,ol{margin:0 0 16px 22px}
+li{margin-bottom:7px}
+
+/* ===== HERO ===== */
+.hero{
+  margin:-60px -48px 50px;padding:64px 48px 52px;
+  background:linear-gradient(135deg,var(--oscuro),var(--morado) 55%,var(--vibrante));
+  color:#fff;position:relative;overflow:hidden;
+}
+.hero::after{
+  content:"";position:absolute;right:-80px;top:-80px;width:340px;height:340px;
+  background:radial-gradient(circle,rgba(255,255,255,.16),transparent 65%);
+}
+.hero .kicker{font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  color:#d6c4ff;margin-bottom:16px}
+.hero h1{font-size:42px;font-weight:900;letter-spacing:-.03em;line-height:1.08;margin-bottom:18px;max-width:660px}
+.hero .hero-sub{font-size:17px;color:#e9ddff;max-width:600px;font-weight:500;line-height:1.55}
+.hero-meta{display:flex;gap:28px;margin-top:28px;flex-wrap:wrap}
+.hero-meta div{font-size:13px;color:#d6c4ff}
+.hero-meta div b{display:block;color:#fff;font-size:15px;font-weight:700;margin-top:2px}
+
+/* ===== PATH MAP ===== */
+.pathmap{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:26px 0 6px}
+.path-step{
+  background:var(--panel);border:1px solid var(--borde);border-radius:13px;padding:16px 14px;
+  position:relative;
+}
+.path-step.now{background:linear-gradient(160deg,var(--morado),var(--vibrante));border:none;color:#fff;box-shadow:0 10px 26px -10px rgba(96,24,240,.6)}
+.path-step .pnum{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--vibrante);margin-bottom:7px}
+.path-step.now .pnum{color:#e6d6ff}
+.path-step h5{font-size:14px;font-weight:800;margin-bottom:6px;line-height:1.25}
+.path-step p{font-size:12px;color:var(--gris);margin:0;line-height:1.4}
+.path-step.now p{color:#ede3ff}
+.path-step .tag{position:absolute;top:-9px;right:10px;background:#c9b6ff;color:#1a1330;
+  font-size:9.5px;font-weight:800;letter-spacing:.08em;padding:3px 9px;border-radius:99px;
+  text-transform:uppercase;box-shadow:0 3px 8px rgba(0,0,0,.12)}
+
+/* ===== CALLOUTS ===== */
+.callout{border-radius:13px;padding:18px 20px;margin:20px 0;border:1px solid;font-size:15px}
+.callout .ic{font-size:18px;margin-right:8px}
+.callout-def{background:var(--panel);border-color:var(--borde)}
+.callout-def .clabel{font-weight:800;color:#c9b6ff;font-size:13px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px}
+.callout-link{background:#1e1638;border-color:#352a5c;border-left:4px solid var(--vibrante)}
+.callout-link .clabel{font-weight:800;color:var(--vibrante);font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;gap:7px}
+.callout-tip{background:var(--exito-bg);border-color:#1d5641}
+.callout-tip .clabel{font-weight:800;color:var(--exito);font-size:12.5px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:5px}
+.callout-warn{background:var(--alerta-bg);border-color:#5c4a22}
+.callout-warn .clabel{font-weight:800;color:var(--alerta);font-size:12.5px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:5px}
+.callout-anchor{background:linear-gradient(135deg,var(--oscuro),var(--morado));color:#fff;border:none;padding:22px 24px;font-size:16.5px;font-weight:600;line-height:1.5}
+.callout-anchor .clabel{color:#d6c4ff;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;margin-bottom:8px}
+
+/* ===== SOCRATIC ===== */
+.socratic{border:1px solid var(--borde);border-radius:14px;margin:22px 0;overflow:hidden;background:var(--panel);box-shadow:0 2px 16px rgba(0,0,0,.4)}
+.socratic .q{padding:18px 20px;background:var(--suave);display:flex;gap:13px;align-items:flex-start}
+.socratic .q .qic{flex-shrink:0;width:30px;height:30px;border-radius:9px;background:var(--morado);color:#fff;display:grid;place-items:center;font-size:15px}
+.socratic .q .qtext{font-weight:600;font-size:15.5px;color:#e6dcff;line-height:1.45}
+.reveal-btn{
+  width:100%;text-align:left;padding:13px 20px;background:var(--panel);border:none;border-top:1px solid var(--borde);
+  cursor:pointer;font-family:'Inter';font-size:13.5px;font-weight:700;color:var(--vibrante);
+  display:flex;align-items:center;gap:9px;transition:background .15s;letter-spacing:.02em;
+}
+.reveal-btn:hover{background:var(--suave)}
+.reveal-btn .chev{transition:transform .25s;font-size:12px}
+.reveal-btn.open .chev{transform:rotate(90deg)}
+.answer{max-height:0;overflow:hidden;transition:max-height .35s ease;background:var(--panel-2)}
+.answer-inner{padding:4px 20px 18px}
+.answer-inner p{font-size:14.5px;margin-bottom:6px}
+.answer-inner .alabel{font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--exito);margin:10px 0 3px;display:block}
+
+/* ===== CODE ===== */
+.code-wrap{margin:16px 0;border-radius:12px;overflow:hidden;border:1px solid #2e1d54}
+.code-head{background:#1b1038;display:flex;align-items:center;justify-content:space-between;padding:9px 14px}
+.code-file{font-family:'JetBrains Mono';font-size:12px;color:#b9a6ee;font-weight:500;display:flex;align-items:center;gap:8px}
+.code-file .fdot{width:9px;height:9px;border-radius:99px;background:#6018F0}
+.copy-btn{background:rgba(255,255,255,.1);border:none;color:#d6c8ff;font-family:'Inter';font-size:11.5px;
+  font-weight:600;padding:5px 12px;border-radius:7px;cursor:pointer;transition:background .15s;letter-spacing:.02em}
+.copy-btn:hover{background:rgba(255,255,255,.2)}
+.copy-btn.done{background:var(--exito);color:#fff}
+pre{background:var(--codigo-bg);color:var(--codigo-texto);padding:16px 18px;overflow-x:auto;font-size:13px;line-height:1.6}
+pre code{font-family:'JetBrains Mono';white-space:pre}
+.tok-kw{color:#c792ea}.tok-str{color:#c3e88d}.tok-num{color:#f78c6c}
+.tok-com{color:#7a6ba8;font-style:italic}.tok-fn{color:#82aaff}.tok-bi{color:#ffcb6b}
+
+/* inline output */
+.output{margin:14px 0;border-radius:12px;overflow:hidden;border:1px solid var(--borde)}
+.output-head{background:var(--suave);font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--gris);padding:8px 14px;display:flex;align-items:center;gap:8px}
+.output pre{background:#16101f;color:#d6f5e4;font-size:12.5px}
+
+/* steps / what did this give me */
+.gave{background:var(--exito-bg);border-left:4px solid var(--exito);border-radius:0 10px 10px 0;padding:14px 18px;margin:16px 0}
+.gave .glabel{font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--exito);margin-bottom:5px}
+.gave p{font-size:14.5px;margin:0;color:#cfeede}
+
+/* dimension cards */
+.dims{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:20px 0}
+.dim{background:var(--panel);border:1px solid var(--borde);border-radius:12px;padding:16px 16px 14px;position:relative}
+.dim .dnum{font-family:'JetBrains Mono';font-size:13px;font-weight:700;color:#fff;background:var(--morado);width:26px;height:26px;border-radius:8px;display:grid;place-items:center;margin-bottom:10px}
+.dim h5{font-size:14.5px;font-weight:700;margin-bottom:4px}
+.dim p{font-size:13px;color:var(--gris);margin:0;line-height:1.4}
+.dim .badge{position:absolute;top:14px;right:14px;font-size:10px;font-weight:700;color:#c9b6ff;background:#2a1f47;padding:3px 8px;border-radius:99px;letter-spacing:.03em}
+
+/* mentiroso infographic */
+.mentiroso{background:var(--panel);border:1px solid var(--borde);border-radius:16px;padding:24px;margin:24px 0}
+.mentiroso h4{margin:0 0 20px;padding:0 0 14px;text-align:center;color:#d9c9ff;font-size:15px;position:relative;z-index:3;background:var(--panel);border-bottom:1px solid var(--borde)}
+.bars{display:flex;gap:30px;justify-content:center;align-items:flex-end;margin:0 0 12px;height:150px}
+.bar-col{display:flex;flex-direction:column;align-items:center;gap:10px;width:130px}
+.bar{width:100%;border-radius:10px 10px 0 0;display:flex;align-items:flex-end;justify-content:center;padding-bottom:14px;color:#fff;font-weight:800;font-size:18px;font-family:'JetBrains Mono';position:relative}
+.bar.real{background:linear-gradient(180deg,var(--exito),#17835a);height:128px}
+.bar.fake{background:linear-gradient(180deg,var(--error),#a52c47);height:132px}
+.bar-label{font-size:12.5px;font-weight:600;text-align:center;color:var(--gris);line-height:1.3}
+.bar-label b{display:block;color:#ece7f7;font-size:13px}
+.mentiroso .verdict{text-align:center;font-size:14px;color:var(--error);font-weight:600;margin-top:8px;background:var(--error-bg);padding:12px 16px;border-radius:10px}
+
+/* guards diagram */
+.guards{display:flex;flex-direction:column;gap:0;margin:24px 0}
+.guard{display:flex;gap:16px;align-items:flex-start;position:relative;padding-bottom:22px}
+.guard:not(:last-child)::before{content:"";position:absolute;left:21px;top:44px;bottom:0;width:2px;background:var(--gris-claro)}
+.guard .gicon{flex-shrink:0;width:44px;height:44px;border-radius:12px;background:linear-gradient(150deg,var(--morado),var(--vibrante));display:grid;place-items:center;font-size:20px;box-shadow:0 6px 16px -6px rgba(96,24,240,.5);z-index:1}
+.guard .gbody h5{font-size:15.5px;font-weight:700;margin-bottom:3px}
+.guard .gbody p{font-size:14px;color:var(--gris);margin:0}
+
+/* files table */
+.ftable{width:100%;border-collapse:collapse;margin:18px 0;font-size:14px}
+.ftable th{background:var(--oscuro);color:#fff;text-align:left;padding:11px 14px;font-size:12.5px;font-weight:700;letter-spacing:.03em}
+.ftable th:first-child{border-radius:10px 0 0 0}.ftable th:last-child{border-radius:0 10px 0 0}
+.ftable td{padding:11px 14px;border-bottom:1px solid var(--borde);vertical-align:top}
+.ftable td code{background:#2a1f47;color:#d9c9ff;padding:2px 7px;border-radius:6px;font-size:12.5px;font-weight:600}
+.ftable tr:last-child td{border-bottom:none}
+
+/* checklist */
+.checklist{list-style:none;margin:18px 0 0}
+.checklist li{display:flex;gap:12px;align-items:flex-start;padding:11px 16px;background:var(--panel);border-radius:10px;margin-bottom:9px;font-size:14.5px}
+.checklist li .cbox{flex-shrink:0;width:22px;height:22px;border-radius:6px;border:2px solid var(--vibrante);display:grid;place-items:center;font-size:13px;color:var(--vibrante);font-weight:800;cursor:pointer;transition:all .15s}
+.checklist li .cbox.checked{background:var(--vibrante);color:#fff}
+
+/* exercise */
+.exercise{background:linear-gradient(150deg,#171029,#1d1437);border:1.5px solid #352a5c;border-radius:16px;padding:26px;margin:24px 0}
+.exercise .etag{display:inline-block;background:var(--vibrante);color:#fff;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:5px 12px;border-radius:99px;margin-bottom:14px}
+.exercise ol{margin-left:20px}.exercise li{font-size:15px;margin-bottom:9px}
+
+/* footer */
+.footer{border-top:1px solid var(--borde);padding:28px 0 0;margin-top:60px;text-align:center;font-size:12.5px;color:var(--gris);line-height:1.7}
+.footer a{color:var(--vibrante);text-decoration:none}
+
+/* presentation hint */
+.pres-hint{position:fixed;bottom:18px;right:18px;background:var(--oscuro);color:#fff;font-size:12px;
+  padding:9px 15px;border-radius:99px;z-index:90;box-shadow:0 8px 24px rgba(60,24,132,.4);font-weight:500}
+.pres-hint kbd{background:rgba(255,255,255,.2);padding:1px 7px;border-radius:5px;font-family:'JetBrains Mono';font-size:11px;font-weight:700}
+
+/* ===== PRESENTATION MODE ===== */
+body.pres .sidebar,body.pres .pres-hint,body.pres .menu-btn{display:none}
+body.pres .main{margin-left:0}
+body.pres .content{display:none}
+.pres-stage{display:none}
+body.pres .pres-stage{
+  display:flex;flex-direction:column;justify-content:center;
+  min-height:100vh;padding:70px 8vw;max-width:1100px;margin:0 auto;
+}
+.pres-slide{display:none;animation:fadeup .4s ease}
+.pres-slide.active{display:block}
+@keyframes fadeup{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.pres-stage h2{font-size:44px;margin-bottom:24px}
+.pres-stage .lead{font-size:22px}
+.pres-bar{position:fixed;top:0;left:0;height:5px;background:linear-gradient(90deg,var(--vibrante),#a888ff);z-index:200;transition:width .3s}
+.pres-count{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono';
+  font-size:13px;color:var(--gris);background:var(--panel);padding:6px 16px;border-radius:99px;border:1px solid var(--borde);z-index:200}
+.pres-exit{position:fixed;top:16px;right:18px;background:var(--oscuro);color:#fff;border:none;
+  padding:8px 16px;border-radius:99px;font-family:'Inter';font-weight:600;font-size:12.5px;cursor:pointer;z-index:200}
+
+@media (max-width:1024px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .menu-btn{display:flex;position:fixed;top:14px;left:14px;z-index:110;width:46px;height:46px;
+    border-radius:12px;background:var(--morado);color:#fff;border:none;cursor:pointer;
+    align-items:center;justify-content:center;font-size:20px;box-shadow:0 6px 18px rgba(60,24,132,.4)}
+  .content{padding:70px 22px 100px}
+  .hero{margin:-70px -22px 40px;padding:54px 22px 44px}
+  .hero h1{font-size:32px}
+  .pathmap{grid-template-columns:repeat(2,1fr)}
+  .dims{grid-template-columns:1fr}
+  .bars{gap:18px}.bar-col{width:110px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<button class="menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+<aside class="sidebar">
+  <div class="sidebar-head">
+    <div class="eyebrow">Módulo 3 · Unidad 1 · Clase 3</div>
+    <h1>Calidad de Datos y Monitoreo de Pipelines</h1>
+    <div class="sub">Caso Rappi Colombia · Guía del estudiante</div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-label"><span>Tu progreso</span><span id="pct">0%</span></div>
+    <div class="progress-track"><div class="progress-bar" id="pbar"></div></div>
+  </div>
+  <ul class="nav" id="nav">
+    <li><a href="#mapa"><span class="num">↗</span> El camino</a></li>
+    <li><a href="#b0"><span class="num">0</span> El almacén que aceptó basura</a></li>
+    <li><a href="#b1"><span class="num">1</span> ¿Qué es calidad de datos?</a></li>
+    <li><a href="#b2"><span class="num">2</span> El feed sano y el corrupto</a></li>
+    <li><a href="#b3"><span class="num">3</span> try/except</a></li>
+    <li><a href="#b4"><span class="num">4</span> Validación a mano</a></li>
+    <li><a href="#b5"><span class="num">5</span> Pandera</a></li>
+    <li><a href="#b6"><span class="num">6</span> Logging y alertas</a></li>
+    <li><a href="#b7"><span class="num">7</span> El pipeline vigilado</a></li>
+    <li><a href="#b8"><span class="num">8</span> Ejercicio en tríos</a></li>
+    <li><a href="#b9"><span class="num">9</span> Cierre y camino</a></li>
+    <li><a href="#check"><span class="num">✓</span> Checklist</a></li>
+  </ul>
+</aside>
+
+<main class="main">
+<div class="content">
+
+  <div class="hero">
+    <div class="kicker">Del notebook a producción · Rappi Colombia</div>
+    <h1>El pipeline que se cuida solo</h1>
+    <p class="hero-sub">Las clases pasadas construimos el pipeline y el almacén. Hoy ponemos el inspector de calidad que vigila que no entre basura — y que avisa cuando algo se rompe a las 3 de la mañana.</p>
+    <div class="hero-meta">
+      <div>Caso de estudio<b>Rappi Colombia</b></div>
+      <div>Herramientas<b>Pandera · logging · SQLAlchemy</b></div>
+      <div>Entorno<b>conda · master-ia</b></div>
+    </div>
+  </div>
+
+  <!-- MAPA -->
+  <section id="mapa">
+    <div class="block-eyebrow"><span class="dot"></span> Dónde estamos</div>
+    <h2>Esta clase no es un tema aislado</h2>
+    <p class="lead">Es el tercer paso de un camino que venimos recorriendo con Rappi. Cada clase prepara la siguiente.</p>
+    <div class="pathmap">
+      <div class="path-step"><div class="pnum">Clase 1</div><h5>El pipeline ETL</h5><p>Extraer, limpiar, cruzar datos desde la API.</p></div>
+      <div class="path-step"><div class="pnum">Clase 2</div><h5>El almacén</h5><p>Guardar en base SQL + MongoDB para que no se pierda.</p></div>
+      <div class="path-step now"><span class="tag">Hoy</span><div class="pnum">Clase 3</div><h5>El inspector</h5><p>Vigilar que lo que guardamos no sea basura, y avisar.</p></div>
+      <div class="path-step"><div class="pnum">Clase 4</div><h5>SQL avanzado</h5><p>Exprimir el almacén confiable para el negocio.</p></div>
+    </div>
+    <div class="callout callout-anchor" style="margin-top:26px">
+      <div class="clabel">La idea que amarra todo hoy</div>
+      En la Clase 2 aprendimos a guardar los datos. Hoy aprendemos a asegurarnos de que lo que guardamos no sea basura — porque un almacén lleno de datos corruptos es peor que no tener almacén.
+    </div>
+  </section>
+
+  <!-- BLOQUE 0 -->
+  <section id="b0">
+    <div class="block-eyebrow"><span class="dot"></span> Bloque 0 · El gancho</div>
+    <h2>El almacén que aceptó basura</h2>
+    <p>La clase pasada montamos la base de datos de Rappi y guardamos 500 predicciones. Quedó hermosa: persistente, consultable, auditable. Ahora la empresa automatiza el pipeline para que corra solo, cada madrugada a las <strong>3am</strong>, y meta los datos nuevos a esa base.</p>
+    <p>Una noche cualquiera, el proveedor de la API cambia el formato sin avisar: los precios empiezan a llegar como texto. El pipeline corre, <strong>no da ningún error</strong>, y guarda los datos en nuestra base.</p>
+
+    <div class="socratic">
+      <div class="q"><div class="qic">?</div><div class="qtext">El pipeline guardó los datos corruptos y no dio ningún error. ¿Cuál es el problema real aquí?</div></div>
+      <button class="reveal-btn" onclick="toggleAns(this)"><span class="chev">▶</span> Ver respuesta</button>
+      <div class="answer"><div class="answer-inner">
+        <p>El problema no es solo que los datos estén malos. El problema es que <strong>nadie se enteró</strong>. El pipeline corrió "exitosamente" guardando basura. La base de la Clase 2 ahora tiene datos falsos adentro, y se ve igual de sana que siempre. El verdadero peligro de los datos malos no es que existan: es que <strong>pasan desapercibidos</strong>.</p>
+      </div></div>
+    </div>
+
+    <div class="callout callout-link">
+      <div class="clabel">🔗 Conexión con la Clase 2</div>
+      ¿Recuerdas el <code>auditoria.py</code> con que le preguntábamos cosas a la base? Imagina correrlo hoy sobre datos corruptos: daría respuestas con total seguridad… y todas estarían mal. La auditoría no sabe distinguir un dato bueno de uno malo. Ese es el hueco que la Clase 2 dejó abierto y que hoy cerramos.
+    </div>
+
+    <div class="socratic">
+      <div class="q"><div class="qic">?</div><div class="qtext">¿En qué momento nos daríamos cuenta del problema, si nadie está vigilando?</div></div>
+      <button class="reveal-btn" onclick="toggleAns(this)"><span class="chev">▶</span> Ver respuesta</button>
+      <div class="answer"><div class="answer-inner">
+        <p>Tarde. Probablemente cuando el equipo de negocio ya tomó una decisión con esos datos y los resultados no cuadraron. Para cuando alguien investiga "por qué los números estaban raros", la plata ya se gastó. <strong>Necesitamos enterarnos a las 3am, no tres semanas después.</strong></p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- BLOQUE 1 -->
+  <section id="b1">
+    <div class="block-eyebrow"><span class="dot"></span> Bloque 1 · Teoría desde cero</div>
+    <h2>¿Qué es calidad de datos?</h2>
+    <p>Antes de definir nada, veamos el daño en vivo y con números. Esto es lo que pasa si guardamos el feed corrupto y le preguntamos algo de negocio.</p>
+
+    <div class="mentiroso">
+      <h4>El promedio mentiroso</h4>
+      <div class="bars">
+        <div class="bar-col">
+          <div class="bar real">$36.715</div>
+          <div class="bar-label"><b>Promedio REAL</b>sobre los 200 pedidos sanos</div>
+        </div>
+        <div class="bar-col">
+          <div class="bar fake">$37.049</div>
+          <div class="bar-label"><b>Lo que responde la base</b>con los datos corruptos adentro</div>
+        </div>
+      </div>
+      <div class="verdict">La base promedió solo 160 de 200 pedidos — ignoró el 20% de los datos en silencio, y respondió como si tuviera todo.</div>
+    </div>
+
+    <p>El problema <strong>no es el tamaño del error</strong> (hoy se parecen por casualidad). Es que el promedio se calculó ignorando silenciosamente 40 pedidos que llegaron como texto. Un número que se ve bien y está mal es más peligroso que un error que se ve.</p>
+
+    <div class="callout callout-def">
+      <div class="clabel">📦 Definición técnica</div>
+      <strong>Calidad de datos</strong> es el grado en que los datos cumplen las condiciones necesarias para usarse con confianza. Se mide en varias dimensiones: que estén <strong>completos</strong>, en el <strong>tipo correcto</strong>, dentro de <strong>rangos válidos</strong>, y con la <strong>estructura esperada</strong>.
+    </div>
+    <div class="callout callout-tip">
+      <div class="clabel">🌍 En la vida real</div>
+      Es el control de calidad en una fábrica de empanadas. No revisas <em>una</em> empanada al inicio del día. Pones un inspector en la banda que revisa <strong>cada una</strong> que pasa, y suena una alarma si sale una mala. Hoy construimos ese inspector, pero para los datos.
+    </div>
+
+    <div class="socratic">
+      <div class="q"><div class="qic">?</div><div class="qtext">En la Clase 1 limpiamos los datos a mano y quedaron perfectos. ¿Por qué no basta con eso?</div></div>
+      <button class="reveal-btn" onclick="toggleAns(this)"><span class="chev">▶</span> Ver respuesta</button>
+      <div class="answer"><div class="answer-inner">
+        <p>Porque la limpieza de la Clase 1 arregló los datos <strong>de ese día</strong>. Pero el pipeline recibe datos nuevos cada madrugada, de un proveedor que puede cambiar el formato cuando quiera. La calidad no es una tarea que se hace una vez, sino una vigilancia que corre <strong>cada vez que llegan datos nuevos</strong>.</p>
+      </div></div>
+    </div>
+
+    <h3>Las 4 dimensiones que vigilamos hoy</h3>
+    <div class="dims">
+      <div class="dim"><div class="dnum">1</div><span class="badge">esquema</span><h5>¿Tiene la estructura esperada?</h5><p>Las columnas correctas, con los nombres correctos.</p></div>
+      <div class="dim"><div class="dnum">2</div><span class="badge">tipo</span><h5>¿Los tipos son correctos?</h5><p>El precio es número, no texto.</p></div>
+      <div class="dim"><div class="dnum">3</div><span class="badge">completitud</span><h5>¿Está completo?</h5><p>No faltan calificaciones.</p></div>
+      <div class="dim"><div class="dnum">4</div><span class="badge">rango</span><h5>¿Los valores tienen sentido?</h5><p>Una calificación está entre 1 y 5, no es 8.</p></div>
+    </div>
+  </section>
+
+  <!-- BLOQUE 2 -->
+  <section id="b2">
+    <div class="block-eyebrow"><span class="dot"></span> Bloque 2 · Preparar el escenario</div>
+    <h2>El feed sano y el corrupto</h2>
+    <p>Para aprender a detectar problemas, necesitamos datos <strong>con</strong> problemas. Creamos dos archivos: el feed sano (como debería llegar) y el corrupto (la madrugada del desastre). Así probamos que el inspector aprueba el bueno y rechaza el malo.</p>
+
+    <div class="callout callout-link">
+      <div class="clabel">🔗 Conexión con la Clase 2</div>
+      Allá usamos <code>random.seed(42)</code> para que todos generáramos las mismas 500 predicciones. Hoy usamos la misma idea de reproducibilidad para que todos tengamos el mismo feed corrupto, con los mismos errores en las mismas filas.
+    </div>
+
+    <h4>Qué hace este bloque</h4>
+    <p>Crea 200 pedidos sanos y los guarda en <code>feed_sano.csv</code>. Luego hace una copia y la ensucia a propósito, y la guarda como <code>feed_corrupto.csv</code>.</p>
+
+    <div class="code-wrap">
+      <div class="code-head"><span class="code-file"><span class="fdot"></span>rappi_calidad/generar_datos.py</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+<pre><code><span class="tok-kw">import</span> pandas <span class="tok-kw">as</span> pd
+<span class="tok-kw">import</span> numpy <span class="tok-kw">as</span> np
+
+np.random.<span class="tok-fn">seed</span>(<span class="tok-num">42</span>)
+
+N = <span class="tok-num">200</span>
+categorias = [<span class="tok-str">"Pasta"</span>, <span class="tok-str">"Pizza"</span>, <span class="tok-str">"Sushi"</span>, <span class="tok-str">"Burgers"</span>, <span class="tok-str">"Postres"</span>, <span class="tok-str">"Bebidas"</span>, <span class="tok-str">"Ensaladas"</span>]
+ciudades = [<span class="tok-str">"Bogotá"</span>, <span class="tok-str">"Medellín"</span>, <span class="tok-str">"Cali"</span>, <span class="tok-str">"Barranquilla"</span>]
+
+df = pd.<span class="tok-fn">DataFrame</span>({
+    <span class="tok-str">"pedido_id"</span>: [<span class="tok-str">f"PED{1000+i}"</span> <span class="tok-kw">for</span> i <span class="tok-kw">in</span> <span class="tok-fn">range</span>(N)],
+    <span class="tok-str">"restaurante_id"</span>: np.random.<span class="tok-fn">randint</span>(<span class="tok-num">1</span>, <span class="tok-num">51</span>, size=N),
+    <span class="tok-str">"categoria"</span>: np.random.<span class="tok-fn">choice</span>(categorias, size=N),
+    <span class="tok-str">"ciudad"</span>: np.random.<span class="tok-fn">choice</span>(ciudades, size=N),
+    <span class="tok-str">"precio"</span>: np.<span class="tok-fn">round</span>(np.random.<span class="tok-fn">uniform</span>(<span class="tok-num">8000</span>, <span class="tok-num">65000</span>, size=N), <span class="tok-num">0</span>),
+    <span class="tok-str">"calificacion"</span>: np.<span class="tok-fn">round</span>(np.random.<span class="tok-fn">uniform</span>(<span class="tok-num">3.0</span>, <span class="tok-num">5.0</span>, size=N), <span class="tok-num">1</span>),
+})
+df.<span class="tok-fn">to_csv</span>(<span class="tok-str">"feed_sano.csv"</span>, index=<span class="tok-kw">False</span>)
+
+dfc = df.<span class="tok-fn">copy</span>()
+dfc[<span class="tok-str">"precio"</span>] = dfc[<span class="tok-str">"precio"</span>].<span class="tok-fn">astype</span>(<span class="tok-bi">object</span>)
+idx_texto = dfc.<span class="tok-fn">sample</span>(<span class="tok-num">40</span>, random_state=<span class="tok-num">1</span>).index
+dfc.loc[idx_texto, <span class="tok-str">"precio"</span>] = dfc.loc[idx_texto, <span class="tok-str">"precio"</span>].<span class="tok-fn">apply</span>(
+    <span class="tok-kw">lambda</span> x: <span class="tok-str">f"${int(x):,}"</span>.<span class="tok-fn">replace</span>(<span class="tok-str">","</span>, <span class="tok-str">"."</span>))
+idx_nulos = dfc.<span class="tok-fn">sample</span>(<span class="tok-num">15</span>, random_state=<span class="tok-num">2</span>).index
+dfc.loc[idx_nulos, <span class="tok-str">"calificacion"</span>] = np.nan
+idx_rango = dfc.<span class="tok-fn">sample</span>(<span class="tok-num">8</span>, random_state=<span class="tok-num">3</span>).index
+dfc.loc[idx_rango, <span class="tok-str">"calificacion"</span>] = np.<span class="tok-fn">round</span>(np.random.<span class="tok-fn">uniform</span>(<span class="tok-num">6</span>, <span class="tok-num">10</span>, size=<span class="tok-num">8</span>), <span class="tok-num">1</span>)
+dfc = dfc.<span class="tok-fn">rename</span>(columns={<span class="tok-str">"ciudad"</span>: <span class="tok-str">"city"</span>})
+dfc.<span class="tok-fn">to_csv</span>(<span class="tok-str">"feed_corrupto.csv"</span>, index=<span class="tok-kw">False</span>)
+
+<span class="tok-fn">print</span>(<span class="tok-str">"Feeds generados: feed_sano.csv y feed_corrupto.csv"</span>)</code></pre>
+    </div>
+
+    <div class="output">
+      <div class="output-head">▸ python generar_datos.py</div>
+<pre>Feeds generados: feed_sano.csv y feed_corrupto.csv</pre>
+    </div>
+
+    <p>El <code>feed_corrupto.csv</code> tiene exactamente estos 4 problemas inyectados:</p>
+    <ul>
+      <li><strong>40 precios</strong> llegan como texto (<code>"$12.500"</code>) en vez de número.</li>
+      <li><strong>15 nulos</strong> en la columna <code>calificacion</code>.</li>
+      <li><strong>8 calificaciones</strong> fuera del rango válido (mayores a 5).</li>
+      <li>La columna <code>ciudad</code> ahora se llama <code>city</code>.</li>
+    </ul>
+    <div class="callout callout-tip">
+      <div class="clabel">💡 Guárdalo mentalmente</div>
+      40, 15, 8 y un cambio de nombre. Cuando construyamos el inspector, tiene que encontrar exactamente estos cuatro. Es nuestra forma de saber si funciona.
+    </div>
+  </section>
+
+  <!-- BLOQUE 3 -->
+  <section id="b3">
+    <div class="block-eyebrow"><span class="dot"></span> Bloque 3 · Primera guarda</div>
+    <h2>Que el pipeline no muera en silencio</h2>
+    <p>Hoy, si la API no responde o el archivo no existe, el pipeline revienta y se detiene en seco. En un proceso automático de las 3am, ese error lo ve… nadie.</p>
+
+    <div class="callout callout-def">
+      <div class="clabel">📦 Definición técnica</div>
+      Una <strong>excepción</strong> es un evento que interrumpe el flujo del programa cuando algo sale mal. El bloque <strong>try / except</strong> permite intentar una operación riesgosa y reaccionar si falla, en lugar de que el programa entero se caiga.
+    </div>
+    <div class="callout callout-tip">
+      <div class="clabel">🌍 En la vida real</div>
+      Es el cinturón de seguridad. No evita el choque, pero controla lo que pasa cuando ocurre. <code>try</code> = manejas normal; <code>except</code> = qué haces si chocas.
+    </div>
+    <div class="callout callout-link">
+      <div class="clabel">🔗 Conexión con la Clase 2</div>
+      ¿Recuerdas el peligro del <code>commit</code> olvidado, ese error silencioso que dejaba la base vacía sin avisar? Hoy enfrentamos la misma familia de problemas: fallas que no gritan. La diferencia es que hoy aprendemos a hacerlas gritar a propósito.
+    </div>
+
+    <h4>Qué hace este bloque</h4>
+    <p>Intenta leer el archivo; si no existe, en lugar de caerse, lo reporta y devuelve <code>None</code>.</p>
+    <div class="code-wrap">
+      <div class="code-head"><span class="code-file"><span class="fdot"></span>rappi_calidad/clase3.ipynb</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+<pre><code><span class="tok-kw">import</span> pandas <span class="tok-kw">as</span> pd
+
+<span class="tok-kw">def</span> <span class="tok-fn">cargar_feed</span>(ruta):
+    <span class="tok-kw">try</span>:
+        df = pd.<span class="tok-fn">read_csv</span>(ruta)
+        <span class="tok-kw">return</span> df
+    <span class="tok-kw">except</span> <span class="tok-bi">FileNotFoundError</span>:
+        <span class="tok-fn">print</span>(<span class="tok-str">f"No se encontró el archivo: {ruta}"</span>)
+        <span class="tok-kw">return</span> <span class="tok-kw">None</span></code></pre>
+    </div>
+    <div class="output">
+      <div class="output-head">▸ Probamos con un archivo que no existe</div>
+<pre>No se encontró el archivo: archivo_que_no_existe.csv
+None</pre>
+    </div>
+    <div class="callout callout-warn">
+      <div class="clabel">⚠️ Ojo con esto</div>
+      Leer el archivo sin error <strong>no</strong> significa que su contenido esté bien. El feed corrupto se lee perfectamente y está lleno de basura. <code>try/except</code> nos protege de errores que <strong>explotan</strong>, pero el feed corrupto no explota: entra calladito. Eso nos lleva al siguiente bloque.
+    </div>
+  </section>
+
+  <!-- BLOQUE 4 -->
+  <section id="b4">
+    <div class="block-eyebrow"><span class="dot"></span> Bloque 4 · Validación</div>
+    <h2>Detectar que el formato cambió</h2>
+    <p>El daño más peligroso es <strong>silencioso</strong>: el archivo se lee bien y los datos están corruptos. Necesitamos revisar el contenido activamente antes de confiar en él. A eso le llamamos <strong>validar la integridad</strong>.</p>
+
+    <div class="callout callout-def">
+      <div class="clabel">📦 Definición técnica</div>
+      <strong>Validar la integridad</strong> es comprobar que los datos cumplen reglas antes de usarlos. El <strong>esquema</strong> es la forma esperada (qué columnas, de qué tipo); <strong>validar el esquema</strong> es confirmar que esa forma no cambió.
+    </div>
+    <div class="callout callout-tip">
+      <div class="clabel">🌍 En la vida real</div>
+      Es el control de migración en el aeropuerto. El oficial revisa que estén todos los campos y que tengan sentido <strong>antes</strong> de dejarte entrar — no cuando ya estás causando líos adentro. Validamos en la puerta, no después.
+    </div>
+    <div class="callout callout-link">
+      <div class="clabel">🔗 Conexión con la Clase 2</div>
+      Allá, al definir la tabla, le pusimos tipos a cada columna (<code>Float</code>, <code>String</code>). Esa rigidez daba integridad: la base rechazaría texto en una columna numérica. Hoy llevamos esa idea un paso antes: lo detectamos nosotros mismos, con mensajes de negocio, antes de intentar guardar.
+    </div>
+
+    <h4>Qué hace este bloque</h4>
+    <p>Define qué columnas esperamos y una función que acumula en una lista todos los problemas que encuentre.</p>
+    <div class="code-wrap">
+      <div class="code-head"><span class="code-file"><span class="fdot"></span>clase3.ipynb · celda nueva</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+<pre><code>ESQUEMA_ESPERADO = {<span class="tok-str">"pedido_id"</span>, <span class="tok-str">"restaurante_id"</span>, <span class="tok-str">"categoria"</span>,
+                    <span class="tok-str">"ciudad"</span>, <span class="tok-str">"precio"</span>, <span class="tok-str">"calificacion"</span>}
+
+<span class="tok-kw">def</span> <span class="tok-fn">validar_feed</span>(df):
+    errores = []
+
+    <span class="tok-kw">if</span> <span class="tok-fn">set</span>(df.columns) != ESQUEMA_ESPERADO:
+        faltan = ESQUEMA_ESPERADO - <span class="tok-fn">set</span>(df.columns)
+        sobran = <span class="tok-fn">set</span>(df.columns) - ESQUEMA_ESPERADO
+        errores.<span class="tok-fn">append</span>(<span class="tok-str">f"Esquema cambió. Faltan: {faltan} | Sobran: {sobran}"</span>)
+        <span class="tok-kw">return</span> errores
+
+    <span class="tok-kw">if</span> pd.<span class="tok-fn">to_numeric</span>(df[<span class="tok-str">"precio"</span>], errors=<span class="tok-str">"coerce"</span>).<span class="tok-fn">isna</span>().<span class="tok-fn">any</span>():
+        cuantos = <span class="tok-fn">int</span>(pd.<span class="tok-fn">to_numeric</span>(df[<span class="tok-str">"precio"</span>], errors=<span class="tok-str">"coerce"</span>).<span class="tok-fn">isna</span>().<span class="tok-fn">sum</span>())
+        errores.<span class="tok-fn">append</span>(<span class="tok-str">f"{cuantos} precios no son numéricos"</span>)
+
+    nulos = <span class="tok-fn">int</span>(df[<span class="tok-str">"calificacion"</span>].<span class="tok-fn">isna</span>().<span class="tok-fn">sum</span>())
+    <span class="tok-kw">if</span> nulos > <span class="tok-num">0</span>:
+        errores.<span class="tok-fn">append</span>(<span class="tok-str">f"{nulos} nulos en calificacion"</span>)
+
+    cal = pd.<span class="tok-fn">to_numeric</span>(df[<span class="tok-str">"calificacion"</span>], errors=<span class="tok-str">"coerce"</span>)
+    fuera = <span class="tok-fn">int</span>(((cal < <span class="tok-num">3</span>) | (cal > <span class="tok-num">5</span>)).<span class="tok-fn">sum</span>())
+    <span class="tok-kw">if</span> fuera > <span class="tok-num">0</span>:
+        errores.<span class="tok-fn">append</span>(<span class="tok-str">f"{fuera} calificaciones fuera de rango [3-5]"</span>)
+
+    <span class="tok-kw">return</span> errores</code></pre>
+    </div>
+
+    <h4>Probamos con los dos feeds</h4>
+    <div class="code-wrap">
+      <div class="code-head"><span class="code-file"><span class="fdot"></span>clase3.ipynb · celda nueva</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+<pre><code>df_sano = pd.<span class="tok-fn">read_csv</span>(<span class="tok-str">"feed_sano.csv"</span>)
+<span class="tok-fn">print</span>(<span class="tok-str">"Feed sano:"</span>, <span class="tok-fn">validar_feed</span>(df_sano))
+
+df_corrupto = pd.<span class="tok-fn">read_csv</span>(<span class="tok-str">"feed_corrupto.csv"</span>)
+<span class="tok-fn">print</span>(<span class="tok-str">"Feed corrupto:"</span>)
+<span class="tok-kw">for</span> e <span class="tok-kw">in</span> <span class="tok-fn">validar_feed</span>(df_corrupto):
+    <span class="tok-fn">print</span>(<span class="tok-str">"  -"</span>, e)</code></pre>
+    </div>
+    <div class="output">
+      <div class="output-head">▸ Salida</div>
+<pre>Feed sano: []
+Feed corrupto:
+  - Esquema cambió. Faltan: {'ciudad'} | Sobran: {'city'}</pre>
+    </div>
+    <p>El feed sano devuelve una lista vacía <code>[]</code> — sin problemas. El corrupto frena en el esquema a propósito: sin las columnas correctas, no tiene sentido seguir. Arreglemos el nombre y veamos los otros tres:</p>
+    <div class="code-wrap">
+      <div class="code-head"><span class="code-file"><span class="fdot"></span>clase3.ipynb · celda nueva</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+<pre><code>df_corrupto2 = df_corrupto.<span class="tok-fn">rename</span>(columns={<span class="tok-str">"city"</span>: <span class="tok-str">"ciudad"</span>})
+<span class="tok-kw">for</span> e <span class="tok-kw">in</span> <span class="tok-fn">validar_feed</span>(df_corrupto2):
+    <span class="tok-fn">print</span>(<span class="tok-str">"  -"</span>, e)</code></pre>
+    </div>
+    <div class="output">
+      <div class="output-head">▸ Salida</div>
+<pre>  - 40 precios no son numéricos
+  - 15 nulos en calificacion
+  - 8 calificaciones fuera de rango [3-5]</pre>
+    </div>
+    <div class="gave">
+      <div class="glabel">¿Y esto qué me dio?</div>
+      <p>¡Ahí están nuestros 40, 15 y 8! El inspector caza las cuatro dimensiones. Ahora el feed corrupto no puede entrar a la base sin que lo sepamos. Pero mira cuánto código costó para solo 6 columnas…</p>
+    </div>
+  </section>
+
+  <!-- BLOQUE 5 -->
+  <section id="b5">
+    <div class="block-eyebrow"><span class="dot"></span> Bloque 5 · La herramienta profesional</div>
+    <h2>Cuando el código a mano no escala: Pandera</h2>
+    <p>Nuestro inspector funciona. Pero si Rappi mañana agrega 25 columnas más, cada una con sus reglas, serían decenas de <code>if</code>, fácil equivocarse, difícil de mantener. Aquí la industria dejó de hacerlo así.</p>
+
+    <div class="callout callout-link">
+      <div class="clabel">🔗 Conexión con la Clase 2 — el mismo salto</div>
+      Allá pasamos de "escribir SQL a mano como strings" → a <strong>SQLAlchemy</strong> (que lo hace por nosotros). Hoy pasamos de "validar a mano con <code>if</code>" → a <strong>Pandera</strong>. Es exactamente el mismo salto de madurez: de hacerlo a mano y frágil, a declararlo limpio y profesional.
+    </div>
+    <div class="callout callout-def">
+      <div class="clabel">📦 Definición técnica</div>
+      <strong>Pandera</strong> es una librería para validar DataFrames de forma declarativa. En lugar de un <code>if</code> por regla, defines un <strong>esquema</strong> y Pandera revisa todo el DataFrame contra él de un solo golpe.
+    </div>
+    <div class="callout callout-tip">
+      <div class="clabel">🌍 En la vida real</div>
+      Pasamos de revisar cada empanada a mano… a una máquina de rayos X programada con las reglas una sola vez. Tú declaras las reglas; la máquina inspecciona todo el lote sola.
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-head"><span class="code-file"><span class="fdot"></span>terminal · entorno master-ia</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+<pre><code>pip install pandera</code></pre>
+    </div>
+    <div class="callout callout-warn">
+      <div class="clabel">⚠️ Nota de versión importante</div>
+      Desde Pandera 0.20+, los componentes para Pandas se importan desde <code>pandera.pandas</code>, no desde <code>pandera</code> directo. Si usas <code>import pandera as pa</code> y luego <code>pa.Column</code>, verás el error "module 'pandera' has no attribute 'Column'". Usa el import de abajo. (Verificado con Pandera 0.32.)
+    </div>
+
+    <h4>Declaramos el mismo inspector, ahora con Pandera</h4>
+    <div class="code-wrap">
+      <div class="code-head"><span class="code-file"><span class="fdot"></span>clase3.ipynb · celda nueva</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+<pre><code><span class="tok-kw">import</span> pandera.pandas <span class="tok-kw">as</span> pa
+<span class="tok-kw">from</span> pandera.pandas <span class="tok-kw">import</span> Column, DataFrameSchema, Check
+
+esquema = <span class="tok-fn">DataFrameSchema</span>({
+    <span class="tok-str">"pedido_id"</span>:      <span class="tok-fn">Column</span>(<span class="tok-bi">str</span>),
+    <span class="tok-str">"restaurante_id"</span>: <span class="tok-fn">Column</span>(<span class="tok-bi">int</span>),
+    <span class="tok-str">"categoria"</span>:      <span class="tok-fn">Column</span>(<span class="tok-bi">str</span>),
+    <span class="tok-str">"ciudad"</span>:         <span class="tok-fn">Column</span>(<span class="tok-bi">str</span>),
+    <span class="tok-str">"precio"</span>:         <span class="tok-fn">Column</span>(<span class="tok-bi">float</span>),
+    <span class="tok-str">"calificacion"</span>:   <span class="tok-fn">Column</span>(<span class="tok-bi">float</span>, Check.<span class="tok-fn">in_range</span>(<span class="tok-num">3.0</span>, <span class="tok-num">5.0</span>), nullable=<span class="tok-kw">False</span>),
+})</code></pre>
+    </div>
+
+    <h4>Validamos el feed corrupto (lazy=True junta todos los errores)</h4>
+    <div class="code-wrap">
+      <div class="code-head"><span class="code-file"><span class="fdot"></span>clase3.ipynb · celda nueva</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+<pre><code>df_corrupto = pd.<span class="tok-fn">read_csv</span>(<span class="tok-str">"feed_corrupto.csv"</span>)
+
+<span class="tok-kw">try</span>:
+    esquema.<span class="tok-fn">validate</span>(df_corrupto, lazy=<span class="tok-kw">True</span>)
+    <span class="tok-fn">print</span>(<span class="tok-str">"Feed válido"</span>)
+<span class="tok-kw">except</span> pa.errors.SchemaErrors <span class="tok-kw">as</span> e:
+    resumen = e.failure_cases.<span class="tok-fn">groupby</span>([<span class="tok-str">"column"</span>, <span class="tok-str">"check"</span>]).<span class="tok-fn">size</span>()
+    <span class="tok-fn">print</span>(resumen)</code></pre>
+    </div>
+    <div class="output">
+      <div class="output-head">▸ Salida</div>
+<pre>column        check
+calificacion  in_range(3.0, 5.0)     8
+              not_nullable          15
+precio        dtype('float64')      40
+dtype: int64</pre>
+    </div>
+    <div class="gave">
+      <div class="glabel">¿Y esto qué me dio?</div>
+      <p>Pandera detectó los mismos problemas que a mano (40 + 15 + 8), pero con <strong>3 líneas de esquema</strong> en vez de 20 de <code>if</code>. Un inspector profesional, mantenible, que crece con una línea por columna nueva.</p>
+    </div>
+
+    <h4>Confirmamos que el feed sano pasa</h4>
+    <div class="code-wrap">
+      <div class="code-head"><span class="code-file"><span class="fdot"></span>clase3.ipynb · celda nueva</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+<pre><code>df_sano = pd.<span class="tok-fn">read_csv</span>(<span class="tok-str">"feed_sano.csv"</span>)
+<span class="tok-fn">print</span>(esquema.<span class="tok-fn">validate</span>(df_sano, lazy=<span class="tok-kw">True</span>).shape)</code></pre>
+    </div>
+    <div class="output">
+      <div class="output-head">▸ Salida</div>
+<pre>(200, 6)</pre>
+    </div>
+    <p>El feed sano pasa completo y devuelve las 200 filas intactas. Aprobado.</p>
+  </section>
+
+  <!-- BLOQUE 6 -->
+  <section id="b6">
+    <div class="block-eyebrow"><span class="dot"></span> Bloque 6 · Que avise solo</div>
+    <h2>Logging y alertas</h2>
+    <p>Ya detectamos los problemas. Pero seguimos mirando la pantalla nosotros. A las 3am no hay nadie mirando la consola. Dejamos atrás el <code>print</code> y usamos <code>logging</code>.</p>
+
+    <div class="callout callout-def">
+      <div class="clabel">📦 Definición técnica</div>
+      <strong>Logging</strong> es el registro estructurado de lo que hace un programa, con niveles (<code>INFO</code>, <code>WARNING</code>, <code>ERROR</code>). A diferencia de <code>print</code>, lleva fecha/hora y nivel, y puede archivarse o enviarse a un sistema de monitoreo. Una <strong>alerta</strong> dispara una acción ante un evento crítico.
+    </div>
+    <div class="callout callout-tip">
+      <div class="clabel">🌍 En la vida real</div>
+      <code>print</code> es contarle algo a alguien que pasaba por ahí. <strong>Logging</strong> es la bitácora de vuelo del avión: queda registrado con hora exacta, se revisa después, y los eventos graves activan una alarma en cabina al instante.
+    </div>
+    <div class="callout callout-link">
+      <div class="clabel">🔗 Conexión con el camino</div>
+      Fíjate en el patrón de hoy: cada herramienta nueva (Pandera, logging) reemplaza una versión casera (los <code>if</code> a mano, el <code>print</code>) por una <strong>profesional</strong>. Eso es exactamente "del notebook a producción", el lema de toda esta unidad.
+    </div>
+
+    <h4>Qué hace este bloque</h4>
+    <p>Configura el logger y define una función de alerta. Hoy solo registra un <code>ERROR</code>; en producción, ahí iría el envío a Slack o correo.</p>
+    <div class="code-wrap">
+      <div class="code-head"><span class="code-file"><span class="fdot"></span>clase3.ipynb · celda nueva</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+<pre><code><span class="tok-kw">import</span> logging
+
+logging.<span class="tok-fn">basicConfig</span>(
+    level=logging.INFO,
+    format=<span class="tok-str">"%(asctime)s | %(levelname)s | %(message)s"</span>
+)
+logger = logging.<span class="tok-fn">getLogger</span>(<span class="tok-str">"pipeline_rappi"</span>)
+
+<span class="tok-kw">def</span> <span class="tok-fn">enviar_alerta</span>(mensaje):
+    logger.<span class="tok-fn">error</span>(<span class="tok-str">f"ALERTA: {mensaje}"</span>)</code></pre>
+    </div>
+    <div class="callout callout-link">
+      <div class="clabel">🔗 Conexión con la Clase 2 — SOLID otra vez</div>
+      ¿Recuerdas por qué separamos los 5 archivos? Separación de responsabilidades (la "S" de SOLID). Aquí lo aplicamos a una función: la lógica de "cómo se avisa" vive en un solo lugar. Mañana cambia a correo o Slack tocando una sola función. SOLID no fue un tema que pasó: es una forma de pensar que usamos hoy otra vez.
+    </div>
+  </section>
+
+  <!-- BLOQUE 7 -->
+  <section id="b7">
+    <div class="block-eyebrow"><span class="dot"></span> Bloque 7 · Todo junto + el puente a SQL</div>
+    <h2>El pipeline vigilado</h2>
+    <p>Hasta ahora exploramos cada herramienta en el notebook. Ahora las unimos en el pipeline final, en un archivo <code>.py</code> (como en la Clase 2): leer con <code>try/except</code>, validar, alertar si falla, guardar si pasa, y <strong>verificar en SQL</strong> que lo guardado está sano.</p>
+
+    <div class="callout callout-link">
+      <div class="clabel">🔗 Conexión con la Clase 2 — se cierra el círculo</div>
+      En la Clase 2 construimos la base y aprendimos a guardar con SQLAlchemy. Hoy ese conocimiento regresa: cuando un feed pasa la validación, lo guardamos en una base SQL igual a la de la Clase 2, y le hacemos una consulta para verificar. El SQL de la Clase 2 no quedó en el aire — es el destino que hoy aprendimos a proteger.
+    </div>
+
+    <h4>El pipeline completo, con todas las guardas en orden</h4>
+    <div class="code-wrap">
+      <div class="code-head"><span class="code-file"><span class="fdot"></span>rappi_calidad/pipeline.py</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+<pre><code><span class="tok-kw">import</span> pandas <span class="tok-kw">as</span> pd
+<span class="tok-kw">import</span> logging
+<span class="tok-kw">from</span> sqlalchemy <span class="tok-kw">import</span> create_engine, text
+
+logging.<span class="tok-fn">basicConfig</span>(level=logging.INFO,
+                    format=<span class="tok-str">"%(asctime)s | %(levelname)s | %(message)s"</span>)
+logger = logging.<span class="tok-fn">getLogger</span>(<span class="tok-str">"pipeline_rappi"</span>)
+
+ESQUEMA = {<span class="tok-str">"pedido_id"</span>, <span class="tok-str">"restaurante_id"</span>, <span class="tok-str">"categoria"</span>,
+           <span class="tok-str">"ciudad"</span>, <span class="tok-str">"precio"</span>, <span class="tok-str">"calificacion"</span>}
+
+<span class="tok-kw">def</span> <span class="tok-fn">enviar_alerta</span>(mensaje):
+    logger.<span class="tok-fn">error</span>(<span class="tok-str">f"ALERTA: {mensaje}"</span>)
+
+<span class="tok-kw">def</span> <span class="tok-fn">validar</span>(df):
+    errores = []
+    <span class="tok-kw">if</span> <span class="tok-fn">set</span>(df.columns) != ESQUEMA:
+        errores.<span class="tok-fn">append</span>(<span class="tok-str">f"Esquema cambió. Recibido: {set(df.columns)}"</span>)
+        <span class="tok-kw">return</span> errores
+    <span class="tok-kw">if</span> pd.<span class="tok-fn">to_numeric</span>(df[<span class="tok-str">"precio"</span>], errors=<span class="tok-str">"coerce"</span>).<span class="tok-fn">isna</span>().<span class="tok-fn">any</span>():
+        errores.<span class="tok-fn">append</span>(<span class="tok-str">"Hay precios no numéricos"</span>)
+    <span class="tok-kw">if</span> df[<span class="tok-str">"calificacion"</span>].<span class="tok-fn">isna</span>().<span class="tok-fn">any</span>():
+        errores.<span class="tok-fn">append</span>(<span class="tok-str">f"{int(df['calificacion'].isna().sum())} nulos en calificacion"</span>)
+    <span class="tok-kw">return</span> errores
+
+<span class="tok-kw">def</span> <span class="tok-fn">procesar_feed</span>(ruta):
+    <span class="tok-kw">try</span>:
+        df = pd.<span class="tok-fn">read_csv</span>(ruta)
+    <span class="tok-kw">except</span> <span class="tok-bi">FileNotFoundError</span>:
+        <span class="tok-fn">enviar_alerta</span>(<span class="tok-str">f"No se encontró el archivo {ruta}"</span>)
+        <span class="tok-kw">return</span> <span class="tok-kw">None</span>
+
+    errores = <span class="tok-fn">validar</span>(df)
+    <span class="tok-kw">if</span> errores:
+        <span class="tok-kw">for</span> e <span class="tok-kw">in</span> errores:
+            <span class="tok-fn">enviar_alerta</span>(e)
+        logger.<span class="tok-fn">warning</span>(<span class="tok-str">f"Feed {ruta} RECHAZADO. No se persiste."</span>)
+        <span class="tok-kw">return</span> <span class="tok-kw">None</span>
+
+    logger.<span class="tok-fn">info</span>(<span class="tok-str">f"Feed {ruta} VÁLIDO. Persistiendo {len(df)} filas..."</span>)
+    engine = <span class="tok-fn">create_engine</span>(<span class="tok-str">"sqlite:///rappi_calidad.db"</span>)
+    df.<span class="tok-fn">to_sql</span>(<span class="tok-str">"pedidos_validados"</span>, engine, if_exists=<span class="tok-str">"replace"</span>, index=<span class="tok-kw">False</span>)
+
+    <span class="tok-kw">with</span> engine.<span class="tok-fn">connect</span>() <span class="tok-kw">as</span> conn:
+        total = conn.<span class="tok-fn">execute</span>(
+            <span class="tok-fn">text</span>(<span class="tok-str">"SELECT COUNT(*) FROM pedidos_validados"</span>)).<span class="tok-fn">scalar</span>()
+        nulos = conn.<span class="tok-fn">execute</span>(
+            <span class="tok-fn">text</span>(<span class="tok-str">"SELECT COUNT(*) FROM pedidos_validados "</span>
+                 <span class="tok-str">"WHERE calificacion IS NULL"</span>)).<span class="tok-fn">scalar</span>()
+    logger.<span class="tok-fn">info</span>(<span class="tok-str">f"Verificación SQL → filas: {total}, nulos: {nulos}"</span>)
+    <span class="tok-kw">return</span> df</code></pre>
+    </div>
+
+    <div class="callout callout-link">
+      <div class="clabel">🔗 Este SQL es el mismo de la Clase 2 y será el de la Clase 4</div>
+      <code>SELECT COUNT(*)</code> lo usamos en la auditoría de la Clase 2. La Clase 4 lo lleva al siguiente nivel con agregaciones complejas sobre esta misma base. Las tres clases tocan SQL, cada una a su profundidad: Clase 2 lo construyó, Clase 3 lo usa para verificar, Clase 4 lo exprime. No son tres temas; son tres profundidades del mismo camino.
+    </div>
+    <div class="callout callout-warn">
+      <div class="clabel">⚠️ Recordatorio de la Clase 2</div>
+      La consulta SQL va escrita directamente en el <code>.py</code>, nunca copiada desde un editor de texto enriquecido. Las comillas tipográficas (las curvas) rompen las queries.
+    </div>
+
+    <h4>Probamos el pipeline completo</h4>
+    <div class="code-wrap">
+      <div class="code-head"><span class="code-file"><span class="fdot"></span>terminal · python pipeline.py</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+<pre><code><span class="tok-fn">print</span>(<span class="tok-str">"INTENTO 1 — feed corrupto (debe rechazarse):"</span>)
+<span class="tok-fn">procesar_feed</span>(<span class="tok-str">"feed_corrupto.csv"</span>)
+
+<span class="tok-fn">print</span>(<span class="tok-str">"\nINTENTO 2 — feed sano (debe persistirse):"</span>)
+<span class="tok-fn">procesar_feed</span>(<span class="tok-str">"feed_sano.csv"</span>)</code></pre>
+    </div>
+    <div class="output">
+      <div class="output-head">▸ Salida</div>
+<pre>INTENTO 1 — feed corrupto (debe rechazarse):
+ERROR | ALERTA: Esquema cambió. Recibido: {'city', ...}
+WARNING | Feed feed_corrupto.csv RECHAZADO. No se persiste.
+
+INTENTO 2 — feed sano (debe persistirse):
+INFO | Feed feed_sano.csv VÁLIDO. Persistiendo 200 filas...
+INFO | Verificación SQL → filas: 200, nulos: 0</pre>
+    </div>
+    <div class="gave">
+      <div class="glabel">¿Y esto qué me dio?</div>
+      <p>El feed corrupto <strong>nunca tocó la base</strong> — fue rechazado y alertado en la puerta. El sano se guardó, y SQL confirma 200 filas con 0 nulos. El pipeline de Rappi ya se protege solo: la basura no llega a la decisión de negocio.</p>
+    </div>
+    <div class="callout callout-anchor">
+      <div class="clabel">🔗 Cerramos el arco del Bloque 0</div>
+      Empezamos preguntando "¿qué pasó con el almacén que aceptó basura?". Ahora tenemos la respuesta completa: pusimos un inspector en la puerta, un cinturón de seguridad y una alarma. El almacén de la Clase 2 ya no acepta cualquier cosa. Eso es lo que construimos hoy.
+    </div>
+  </section>
+
+  <!-- BLOQUE 8 -->
+  <section id="b8">
+    <div class="block-eyebrow"><span class="dot"></span> Bloque 8 · Manos a la obra</div>
+    <h2>Ejercicio en tríos</h2>
+    <div class="exercise">
+      <span class="etag">Actividad en tríos</span>
+      <p><strong>Contexto:</strong> Rappi agregó una columna nueva al feed: <code>tiempo_entrega_min</code> (entero, debe estar entre <strong>10 y 90</strong> minutos).</p>
+      <ol>
+        <li>Agreguen la regla al <strong>esquema de Pandera</strong> (una línea nueva).</li>
+        <li>Generen un mini-feed con 5 tiempos de entrega imposibles (por ejemplo, 200 minutos).</li>
+        <li>Confirmen que Pandera los detecta.</li>
+        <li><strong>Pregunta de negocio:</strong> ¿por qué un tiempo de entrega de 200 minutos es un problema <em>de datos</em> aunque técnicamente 200 sea un número perfectamente válido?</li>
+      </ol>
+    </div>
+    <div class="socratic">
+      <div class="q"><div class="qic">?</div><div class="qtext">¿Por qué 200 minutos es un problema de datos si 200 es un número válido?</div></div>
+      <button class="reveal-btn" onclick="toggleAns(this)"><span class="chev">▶</span> Ver respuesta</button>
+      <div class="answer"><div class="answer-inner">
+        <p>Porque la validación de <strong>tipo</strong> (es un número entero, correcto) no garantiza la validación de <strong>negocio</strong> (es un número posible en la realidad). Un dato puede ser técnicamente correcto y aun así estar mal. Por eso existen las reglas de <strong>rango</strong>: capturan lo que el tipo solo no puede. 200 pasa el chequeo de "¿es entero?" pero falla el de "¿tiene sentido para una entrega?".</p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- BLOQUE 9 -->
+  <section id="b9">
+    <div class="block-eyebrow"><span class="dot"></span> Bloque 9 · Cierre</div>
+    <h2>El camino y lo que viene</h2>
+    <p>Hoy convertimos un pipeline frágil en uno <strong>vigilado</strong>. Le agregamos tres cosas que ningún ETL tiene por defecto:</p>
+    <div class="guards">
+      <div class="guard"><div class="gicon">🔒</div><div class="gbody"><h5>try / except</h5><p>Para que no muera en silencio — el cinturón de seguridad.</p></div></div>
+      <div class="guard"><div class="gicon">🔎</div><div class="gbody"><h5>Validación de integridad</h5><p>Primero a mano, luego con Pandera — el inspector de calidad.</p></div></div>
+      <div class="guard"><div class="gicon">🚨</div><div class="gbody"><h5>Alertas con logging</h5><p>Para que avise solo a las 3am — la alarma.</p></div></div>
+    </div>
+
+    <div class="socratic">
+      <div class="q"><div class="qic">?</div><div class="qtext">Ya tenemos datos limpios, guardados y confiables. ¿Qué falta para cerrar el ciclo de valor para el negocio?</div></div>
+      <button class="reveal-btn" onclick="toggleAns(this)"><span class="chev">▶</span> Ver respuesta</button>
+      <div class="answer"><div class="answer-inner">
+        <p><strong>Exprimirlos para responder preguntas de negocio.</strong> Un dato confiable que nadie analiza no genera valor. En la <strong>Clase 4 (SQL Avanzado)</strong> dejamos de solo contar filas y empezamos a responder preguntas complejas: agregaciones, vistas, window functions. La base ya es confiable gracias a lo de hoy — ahora la podemos exprimir sin miedo.</p>
+      </div></div>
+    </div>
+
+    <div class="callout callout-anchor">
+      <div class="clabel">🔗 El cierre del camino completo</div>
+      Clase 1 produjo datos → Clase 2 los guardó → Clase 3 los blindó → Clase 4 los exprime. Cada clase preparó la siguiente. Y la Clase 4 solo es posible porque hoy hicimos que la base fuera confiable. Si analizáramos datos corruptos, todos los reportes serían mentiras elegantes. Lo de hoy fue el cimiento de confianza sobre el que la Clase 4 va a construir.
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section id="check">
+    <div class="block-eyebrow"><span class="dot"></span> Antes de cerrar</div>
+    <h2>Checklist de la clase</h2>
+    <p class="lead">Toca cada casilla a medida que lo logras.</p>
+    <ul class="checklist">
+      <li><span class="cbox" onclick="toggleCheck(this)"></span> Creé la carpeta <code>rappi_calidad/</code> con todos los archivos dentro.</li>
+      <li><span class="cbox" onclick="toggleCheck(this)"></span> <code>generar_datos.py</code> creó <code>feed_sano.csv</code> y <code>feed_corrupto.csv</code>.</li>
+      <li><span class="cbox" onclick="toggleCheck(this)"></span> Entiendo qué protege <code>try/except</code> y qué no (errores silenciosos).</li>
+      <li><span class="cbox" onclick="toggleCheck(this)"></span> Validé el feed a mano y detecté los 4 problemas.</li>
+      <li><span class="cbox" onclick="toggleCheck(this)"></span> Repliqué la validación con Pandera en 3 líneas de esquema.</li>
+      <li><span class="cbox" onclick="toggleCheck(this)"></span> Configuré <code>logging</code> y una función de alerta.</li>
+      <li><span class="cbox" onclick="toggleCheck(this)"></span> <code>pipeline.py</code> rechazó el corrupto y persistió el sano, con verificación SQL.</li>
+      <li><span class="cbox" onclick="toggleCheck(this)"></span> Puedo explicar cómo hoy conecta la Clase 2 con la Clase 4.</li>
+    </ul>
+
+    <h3 style="margin-top:38px">Archivos que creaste hoy</h3>
+    <table class="ftable">
+      <thead><tr><th>Archivo</th><th>Qué hace</th><th>Cuándo se corre</th></tr></thead>
+      <tbody>
+        <tr><td><code>generar_datos.py</code></td><td>Fabrica los feeds sano y corrupto.</td><td>Una vez, al inicio.</td></tr>
+        <tr><td><code>clase3.ipynb</code></td><td>Notebook de exploración: try/except, validación, Pandera, logging.</td><td>Durante la clase.</td></tr>
+        <tr><td><code>pipeline.py</code></td><td>El pipeline final con todas las guardas + verificación SQL.</td><td>El cierre técnico.</td></tr>
+        <tr><td><code>feed_sano.csv</code><br><code>feed_corrupto.csv</code></td><td>Los datos de prueba. Se generan solos.</td><td>Los crea generar_datos.</td></tr>
+        <tr><td><code>rappi_calidad.db</code></td><td>La base donde se guarda lo validado. Se genera sola.</td><td>La crea pipeline.py.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <div class="footer">
+    © 2026 Ana Alvarado · Educadora Tech &amp; Desarrolladora Full Stack · Todos los derechos reservados<br>
+    <a href="https://linkedin.com/in/ana-alvarado-instructora-full-stack" target="_blank">linkedin.com/in/ana-alvarado-instructora-full-stack</a>
+  </div>
+
+</div>
+</main>
+
+<div class="pres-hint">Presiona <kbd>P</kbd> para modo presentación</div>
+
+<!-- PRESENTATION STAGE -->
+<div class="pres-bar" id="presBar" style="display:none"></div>
+<div class="pres-count" id="presCount" style="display:none"></div>
+<button class="pres-exit" id="presExit" style="display:none" onclick="exitPres()">Salir · Esc</button>
+<div class="pres-stage" id="presStage"></div>
+
+<script>
+/* ===== PROGRESS + ACTIVE NAV ===== */
+const navLinks=[...document.querySelectorAll('.nav a')];
+const sections=[...document.querySelectorAll('section')];
+const pbar=document.getElementById('pbar'),pct=document.getElementById('pct');
+function onScroll(){
+  const sc=window.scrollY,h=document.body.scrollHeight-window.innerHeight;
+  const p=Math.min(100,Math.round(sc/h*100));
+  pbar.style.width=p+'%';pct.textContent=p+'%';
+  let cur=sections[0];
+  for(const s of sections){if(s.getBoundingClientRect().top<=120)cur=s;}
+  navLinks.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+cur.id));
+}
+window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+
+navLinks.forEach(a=>a.addEventListener('click',()=>{
+  document.querySelector('.sidebar').classList.remove('open');
+}));
+
+/* ===== REVEAL ANSWERS ===== */
+function toggleAns(btn){
+  btn.classList.toggle('open');
+  const ans=btn.nextElementSibling;
+  if(ans.style.maxHeight){ans.style.maxHeight=null;btn.querySelector('.chev').textContent='▶';}
+  else{ans.style.maxHeight=ans.scrollHeight+'px';btn.querySelector('.chev').textContent='▶';}
+  btn.innerHTML=btn.classList.contains('open')
+    ?'<span class="chev" style="transform:rotate(90deg)">▶</span> Ocultar respuesta'
+    :'<span class="chev">▶</span> Ver respuesta';
+}
+
+/* ===== COPY CODE ===== */
+function copyCode(btn){
+  const pre=btn.closest('.code-wrap').querySelector('pre');
+  const text=pre.innerText;
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.textContent='✓ Copiado';btn.classList.add('done');
+    setTimeout(()=>{btn.textContent='Copiar';btn.classList.remove('done');},1600);
+  });
+}
+
+/* ===== CHECKLIST ===== */
+function toggleCheck(box){box.classList.toggle('checked');box.textContent=box.classList.contains('checked')?'✓':'';}
+
+/* ===== PRESENTATION MODE ===== */
+let slides=[],idx=0,presOn=false;
+function buildSlides(){
+  const stage=document.getElementById('presStage');
+  stage.innerHTML='';slides=[];
+  const defs=[
+    {e:'Módulo 3 · Unidad 1 · Clase 3',t:'Calidad de Datos y Monitoreo de Pipelines',l:'El pipeline que se cuida solo · Caso Rappi Colombia'},
+    {e:'Dónde estamos',t:'Esta clase no es un tema aislado',l:'Clase 1 produjo datos → Clase 2 los guardó → Clase 3 (hoy) los blinda → Clase 4 los exprime.'},
+    {e:'Bloque 0 · El gancho',t:'El almacén que aceptó basura',l:'El pipeline corre solo a las 3am y guarda datos corruptos sin dar ningún error. ¿Qué pasó con el almacén que construimos?'},
+    {e:'La idea clave',t:'Un almacén con basura es peor que no tener almacén',l:'Uno vacío no engaña a nadie. Uno con datos corruptos se ve sano, y el negocio decide con datos falsos sin sospechar.'},
+    {e:'Bloque 1',t:'El promedio mentiroso',l:'Real: $36.715 · Lo que responde la base: $37.049 sobre solo 160 de 200 pedidos. Ignoró el 20% en silencio.'},
+    {e:'Bloque 1',t:'Las 4 dimensiones que vigilamos',l:'1. Esquema · 2. Tipo · 3. Completitud · 4. Rango. Cada error del feed corrupto rompe una de ellas.'},
+    {e:'Bloque 3',t:'try / except: el cinturón de seguridad',l:'No evita el choque, pero controla lo que pasa cuando ocurre. Protege de errores que explotan — no de los silenciosos.'},
+    {e:'Bloque 4',t:'Validar la integridad: el control de migración',l:'Revisamos en la puerta, antes de dejar entrar. El inspector a mano caza los 40 precios, 15 nulos y 8 fuera de rango.'},
+    {e:'Bloque 5',t:'Pandera: la máquina de rayos X',l:'El mismo salto que SQLAlchemy en la Clase 2: de hacerlo a mano y frágil, a declararlo limpio. 3 líneas en vez de 20 if.'},
+    {e:'Bloque 6',t:'Logging y alertas: la bitácora de vuelo',l:'print se pierde; logging deja rastro con hora y gravedad, y dispara alertas. Para enterarnos a las 3am, no en 3 semanas.'},
+    {e:'Bloque 7',t:'El pipeline vigilado',l:'Feed corrupto → rechazado y alertado, nunca toca la base. Feed sano → persistido, SQL confirma 200 filas, 0 nulos.'},
+    {e:'Cierre',t:'Hoy le pusimos un guardián al pipeline',l:'try/except + validación + alertas. Y dejamos la base confiable para que la Clase 4 la exprima con SQL avanzado.'},
+  ];
+  defs.forEach((d,i)=>{
+    const s=document.createElement('div');s.className='pres-slide'+(i===0?' active':'');
+    s.innerHTML=`<div class="block-eyebrow"><span class="dot"></span> ${d.e}</div><h2>${d.t}</h2><p class="lead">${d.l}</p>`;
+    stage.appendChild(s);slides.push(s);
+  });
+}
+function showSlide(n){
+  idx=Math.max(0,Math.min(slides.length-1,n));
+  slides.forEach((s,i)=>s.classList.toggle('active',i===idx));
+  document.getElementById('presBar').style.width=((idx+1)/slides.length*100)+'%';
+  document.getElementById('presCount').textContent=`${idx+1} / ${slides.length}`;
+}
+function enterPres(){
+  if(!slides.length)buildSlides();
+  presOn=true;document.body.classList.add('pres');
+  ['presBar','presCount','presExit'].forEach(id=>document.getElementById(id).style.display='');
+  showSlide(0);
+}
+function exitPres(){
+  presOn=false;document.body.classList.remove('pres');
+  ['presBar','presCount','presExit'].forEach(id=>document.getElementById(id).style.display='none');
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='p'||e.key==='P'){if(!presOn&&!/input|textarea/i.test(document.activeElement.tagName))enterPres();}
+  else if(presOn){
+    if(e.key==='Escape')exitPres();
+    else if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();showSlide(idx+1);}
+    else if(e.key==='ArrowLeft')showSlide(idx-1);
+  }
+});
+</script>
+</body>
+</html>

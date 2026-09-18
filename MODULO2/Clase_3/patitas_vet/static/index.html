@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Patitas Felices - Dueños</title>
+  <style>
+    body{font-family: Arial, Helvetica, sans-serif;max-width:900px;margin:24px auto;padding:0 12px}
+    h1{color:#1f7a6b}
+    form{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+    input{padding:8px;border:1px solid #ccc;border-radius:6px}
+    button{background:#1f7a6b;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer}
+    .card{border:1px solid #eee;padding:12px;margin:8px 0;border-radius:6px;display:flex;justify-content:space-between}
+    .left{display:flex;gap:12px;flex-direction:column}
+  </style>
+</head>
+<body>
+  <h1>Patitas Felices — Gestión</h1>
+
+  <nav style="display:flex;gap:12px;margin-bottom:18px">
+    <button onclick="document.getElementById('section-duenos').scrollIntoView()">Dueños</button>
+    <button onclick="document.getElementById('section-mascotas').scrollIntoView()">Mascotas</button>
+    <button onclick="document.getElementById('section-vets').scrollIntoView()">Veterinarios</button>
+  </nav>
+
+  <section id="section-duenos">
+    <h2>Dueños</h2>
+    <form id="dueno-form">
+      <input id="dueno-id" type="hidden">
+      <input id="nombre" name="nombre" placeholder="Nombre" required minlength="2" maxlength="60">
+      <input id="telefono" name="telefono" placeholder="Teléfono" required minlength="7" maxlength="15">
+      <input id="email" name="email" placeholder="Email" type="email" required>
+      <button type="submit">Guardar dueño</button>
+      <button type="button" id="dueno-cancel" style="display:none">Cancelar</button>
+    </form>
+    <div id="duenos-list"></div>
+  </section>
+
+  <hr>
+
+  <section id="section-mascotas">
+    <h2>Mascotas</h2>
+    <form id="mascota-form">
+      <input id="mascota-id" type="hidden">
+      <input id="m-nombre" name="nombre" placeholder="Nombre" required minlength="1" maxlength="40">
+      <input id="m-especie" name="especie" placeholder="Especie" required minlength="2" maxlength="30">
+      <input id="m-raza" name="raza" placeholder="Raza">
+      <input id="m-fecha" name="fecha_nacimiento" placeholder="Nacimiento (YYYY-MM-DD)" type="date">
+      <select id="m-dueno" required></select>
+      <button type="submit">Guardar mascota</button>
+      <button type="button" id="mascota-cancel" style="display:none">Cancelar</button>
+    </form>
+    <div id="mascotas-list"></div>
+  </section>
+
+  <hr>
+
+  <section id="section-vets">
+    <h2>Veterinarios</h2>
+    <form id="vet-form">
+      <input id="vet-id" type="hidden">
+      <input id="v-nombre" name="nombre" placeholder="Nombre" required minlength="2" maxlength="60">
+      <input id="v-especialidad" name="especialidad" placeholder="Especialidad" required minlength="2" maxlength="40">
+      <button type="submit">Guardar veterinario</button>
+      <button type="button" id="vet-cancel" style="display:none">Cancelar</button>
+    </form>
+    <div id="vets-list"></div>
+  </section>
+
+  <script src="/app.js"></script>
+</body>
+</html>

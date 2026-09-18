@@ -1,0 +1,3 @@
+Maria,-52,2026-06-12 16:31:21 --> Edad negativa
+,23,2026-06-12 16:31:38 --> Nombre vacío
+Felipe,148,2026-06-12 16:32:22 --> Edad mayor a 120

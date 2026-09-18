@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda Dev - Gestión</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            background: #f8f9fa;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: #495057;
+            transition: all 0.3s ease;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .form-section h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        thead {
+            background: #667eea;
+            color: white;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            color: #667eea;
+        }
+
+        .close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6c757d;
+        }
+
+        .close:hover {
+            color: #dc3545;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏪 Tienda Dev</h1>
+            <p>Sistema de Gestión de Inventario</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="proveedores">Proveedores</button>
+            <button class="tab" data-tab="categorias">Categorías</button>
+            <button class="tab" data-tab="productos">Productos</button>
+        </div>
+
+        <div class="alert alert-success" id="successAlert"></div>
+        <div class="alert alert-error" id="errorAlert"></div>
+
+        <!-- Proveedores Tab -->
+        <div class="tab-content active" id="proveedores">
+            <div class="form-section">
+                <h3>➕ Nuevo Proveedor</h3>
+                <form id="proveedorForm">
+                    <div class="form-group">
+                        <label>Nombre:</label>
+                        <input type="text" id="proveedorNombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" id="proveedorEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Teléfono:</label>
+                        <input type="text" id="proveedorTelefono">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar Proveedor</button>
+                </form>
+            </div>
+            <div class="table-container">
+                <h3>📋 Lista de Proveedores</h3>
+                <div id="proveedoresLoading" class="loading">Cargando...</div>
+                <table id="proveedoresTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="proveedoresBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Categorías Tab -->
+        <div class="tab-content" id="categorias">
+            <div class="form-section">
+                <h3>➕ Nueva Categoría</h3>
+                <form id="categoriaForm">
+                    <div class="form-group">
+                        <label>Nombre:</label>
+                        <input type="text" id="categoriaNombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Descripción:</label>
+                        <textarea id="categoriaDescripcion" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar Categoría</button>
+                </form>
+            </div>
+            <div class="table-container">
+                <h3>📋 Lista de Categorías</h3>
+                <div id="categoriasLoading" class="loading">Cargando...</div>
+                <table id="categoriasTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="categoriasBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Productos Tab -->
+        <div class="tab-content" id="productos">
+            <div class="form-section">
+                <h3>➕ Nuevo Producto</h3>
+                <form id="productoForm">
+                    <div class="form-group">
+                        <label>Nombre:</label>
+                        <input type="text" id="productoNombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Precio:</label>
+                        <input type="number" id="productoPrecio" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Stock:</label>
+                        <input type="number" id="productoStock" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Categoría:</label>
+                        <select id="productoCategoria" required>
+                            <option value="">Seleccione una categoría</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Proveedor:</label>
+                        <select id="productoProveedor">
+                            <option value="">Seleccione un proveedor (opcional)</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar Producto</button>
+                </form>
+            </div>
+            <div class="table-container">
+                <h3>📋 Lista de Productos</h3>
+                <div id="productosLoading" class="loading">Cargando...</div>
+                <table id="productosTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Precio</th>
+                            <th>Stock</th>
+                            <th>Categoría</th>
+                            <th>Proveedor</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productosBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para editar -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Editar</h3>
+                <button class="close" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+
+        // Tab functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+                
+                // Load data when tab is opened
+                if (tab.dataset.tab === 'proveedores') loadProveedores();
+                if (tab.dataset.tab === 'categorias') loadCategorias();
+                if (tab.dataset.tab === 'productos') {
+                    loadCategorias();
+                    loadProveedores();
+                    loadProductos();
+                }
+            });
+        });
+
+        // Alert functions
+        function showSuccess(message) {
+            const alert = document.getElementById('successAlert');
+            alert.textContent = message;
+            alert.style.display = 'block';
+            setTimeout(() => alert.style.display = 'none', 3000);
+        }
+
+        function showError(message) {
+            const alert = document.getElementById('errorAlert');
+            alert.textContent = message;
+            alert.style.display = 'block';
+            setTimeout(() => alert.style.display = 'none', 3000);
+        }
+
+        // API functions
+        async function apiRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, options);
+                if (!response.ok) throw new Error('Error en la petición');
+                return await response.json();
+            } catch (error) {
+                showError(error.message);
+                return null;
+            }
+        }
+
+        // PROVEEDORES
+        async function loadProveedores() {
+            document.getElementById('proveedoresLoading').style.display = 'block';
+            const proveedores = await apiRequest(`${API_BASE}/proveedores`);
+            document.getElementById('proveedoresLoading').style.display = 'none';
+            
+            const tbody = document.getElementById('proveedoresBody');
+            tbody.innerHTML = proveedores ? proveedores.map(p => `
+                <tr>
+                    <td>${p.id}</td>
+                    <td>${p.nombre}</td>
+                    <td>${p.email}</td>
+                    <td>${p.telefono || '-'}</td>
+                    <td class="actions">
+                        <button class="btn btn-warning" onclick="editProveedor(${p.id})">Editar</button>
+                        <button class="btn btn-danger" onclick="deleteProveedor(${p.id})">Eliminar</button>
+                    </td>
+                </tr>
+            `).join('') : '<tr><td colspan="5" class="empty-state">No hay proveedores</td></tr>';
+
+            // Update select in productos
+            const select = document.getElementById('productoProveedor');
+            select.innerHTML = '<option value="">Seleccione un proveedor (opcional)</option>' +
+                (proveedores ? proveedores.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('') : '');
+        }
+
+        document.getElementById('proveedorForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                nombre: document.getElementById('proveedorNombre').value,
+                email: document.getElementById('proveedorEmail').value,
+                telefono: document.getElementById('proveedorTelefono').value || null
+            };
+            
+            const result = await apiRequest(`${API_BASE}/proveedores`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            if (result) {
+                showSuccess('Proveedor creado exitosamente');
+                document.getElementById('proveedorForm').reset();
+                loadProveedores();
+            }
+        });
+
+        async function deleteProveedor(id) {
+            if (confirm('¿Está seguro de eliminar este proveedor?')) {
+                const result = await apiRequest(`${API_BASE}/proveedores/${id}`, { method: 'DELETE' });
+                if (result) {
+                    showSuccess('Proveedor eliminado');
+                    loadProveedores();
+                }
+            }
+        }
+
+        async function editProveedor(id) {
+            const proveedor = await apiRequest(`${API_BASE}/proveedores/${id}`);
+            if (proveedor) {
+                document.getElementById('modalTitle').textContent = 'Editar Proveedor';
+                document.getElementById('modalBody').innerHTML = `
+                    <form id="editProveedorForm">
+                        <div class="form-group">
+                            <label>Nombre:</label>
+                            <input type="text" id="editProveedorNombre" value="${proveedor.nombre}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email:</label>
+                            <input type="email" id="editProveedorEmail" value="${proveedor.email}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Teléfono:</label>
+                            <input type="text" id="editProveedorTelefono" value="${proveedor.telefono || ''}">
+                        </div>
+                        <button type="submit" class="btn btn-success">Actualizar</button>
+                    </form>
+                `;
+                document.getElementById('editModal').classList.add('active');
+                
+                document.getElementById('editProveedorForm').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const data = {
+                        nombre: document.getElementById('editProveedorNombre').value,
+                        email: document.getElementById('editProveedorEmail').value,
+                        telefono: document.getElementById('editProveedorTelefono').value || null
+                    };
+                    const result = await apiRequest(`${API_BASE}/proveedores/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    if (result) {
+                        showSuccess('Proveedor actualizado');
+                        closeModal();
+                        loadProveedores();
+                    }
+                });
+            }
+        }
+
+        // CATEGORIAS
+        async function loadCategorias() {
+            document.getElementById('categoriasLoading').style.display = 'block';
+            const categorias = await apiRequest(`${API_BASE}/categorias/`);
+            document.getElementById('categoriasLoading').style.display = 'none';
+            
+            const tbody = document.getElementById('categoriasBody');
+            tbody.innerHTML = categorias ? categorias.map(c => `
+                <tr>
+                    <td>${c.id}</td>
+                    <td>${c.nombre}</td>
+                    <td>${c.descripcion || '-'}</td>
+                    <td class="actions">
+                        <button class="btn btn-warning" onclick="editCategoria(${c.id})">Editar</button>
+                        <button class="btn btn-danger" onclick="deleteCategoria(${c.id})">Eliminar</button>
+                    </td>
+                </tr>
+            `).join('') : '<tr><td colspan="4" class="empty-state">No hay categorías</td></tr>';
+
+            // Update select in productos
+            const select = document.getElementById('productoCategoria');
+            select.innerHTML = '<option value="">Seleccione una categoría</option>' +
+                (categorias ? categorias.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('') : '');
+        }
+
+        document.getElementById('categoriaForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                nombre: document.getElementById('categoriaNombre').value,
+                descripcion: document.getElementById('categoriaDescripcion').value || null
+            };
+            
+            const result = await apiRequest(`${API_BASE}/categorias/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            if (result) {
+                showSuccess('Categoría creada exitosamente');
+                document.getElementById('categoriaForm').reset();
+                loadCategorias();
+            }
+        });
+
+        async function deleteCategoria(id) {
+            if (confirm('¿Está seguro de eliminar esta categoría?')) {
+                const result = await apiRequest(`${API_BASE}/categorias/${id}`, { method: 'DELETE' });
+                if (result) {
+                    showSuccess('Categoría eliminada');
+                    loadCategorias();
+                }
+            }
+        }
+
+        async function editCategoria(id) {
+            const categoria = await apiRequest(`${API_BASE}/categorias/${id}`);
+            if (categoria) {
+                document.getElementById('modalTitle').textContent = 'Editar Categoría';
+                document.getElementById('modalBody').innerHTML = `
+                    <form id="editCategoriaForm">
+                        <div class="form-group">
+                            <label>Nombre:</label>
+                            <input type="text" id="editCategoriaNombre" value="${categoria.nombre}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Descripción:</label>
+                            <textarea id="editCategoriaDescripcion" rows="3">${categoria.descripcion || ''}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success">Actualizar</button>
+                    </form>
+                `;
+                document.getElementById('editModal').classList.add('active');
+                
+                document.getElementById('editCategoriaForm').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const data = {
+                        nombre: document.getElementById('editCategoriaNombre').value,
+                        descripcion: document.getElementById('editCategoriaDescripcion').value || null
+                    };
+                    const result = await apiRequest(`${API_BASE}/categorias/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    if (result) {
+                        showSuccess('Categoría actualizada');
+                        closeModal();
+                        loadCategorias();
+                    }
+                });
+            }
+        }
+
+        // PRODUCTOS
+        async function loadProductos() {
+            document.getElementById('productosLoading').style.display = 'block';
+            const productos = await apiRequest(`${API_BASE}/productos/`);
+            document.getElementById('productosLoading').style.display = 'none';
+            
+            const tbody = document.getElementById('productosBody');
+            tbody.innerHTML = productos ? productos.map(p => `
+                <tr>
+                    <td>${p.id}</td>
+                    <td>${p.nombre}</td>
+                    <td>$${p.precio.toFixed(2)}</td>
+                    <td>${p.stock}</td>
+                    <td>${p.categoria ? p.categoria.nombre : '-'}</td>
+                    <td>${p.proveedor ? p.proveedor.nombre : '-'}</td>
+                    <td class="actions">
+                        <button class="btn btn-warning" onclick="editProducto(${p.id})">Editar</button>
+                        <button class="btn btn-danger" onclick="deleteProducto(${p.id})">Eliminar</button>
+                    </td>
+                </tr>
+            `).join('') : '<tr><td colspan="7" class="empty-state">No hay productos</td></tr>';
+        }
+
+        document.getElementById('productoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                nombre: document.getElementById('productoNombre').value,
+                precio: parseFloat(document.getElementById('productoPrecio').value),
+                stock: parseInt(document.getElementById('productoStock').value),
+                categoria_id: parseInt(document.getElementById('productoCategoria').value),
+                proveedor_id: document.getElementById('productoProveedor').value ? parseInt(document.getElementById('productoProveedor').value) : null
+            };
+            
+            const result = await apiRequest(`${API_BASE}/productos/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            if (result) {
+                showSuccess('Producto creado exitosamente');
+                document.getElementById('productoForm').reset();
+                loadProductos();
+            }
+        });
+
+        async function deleteProducto(id) {
+            if (confirm('¿Está seguro de eliminar este producto?')) {
+                const result = await apiRequest(`${API_BASE}/productos/${id}`, { method: 'DELETE' });
+                if (result) {
+                    showSuccess('Producto eliminado');
+                    loadProductos();
+                }
+            }
+        }
+
+        async function editProducto(id) {
+            const producto = await apiRequest(`${API_BASE}/productos/${id}`);
+            if (producto) {
+                document.getElementById('modalTitle').textContent = 'Editar Producto';
+                document.getElementById('modalBody').innerHTML = `
+                    <form id="editProductoForm">
+                        <div class="form-group">
+                            <label>Nombre:</label>
+                            <input type="text" id="editProductoNombre" value="${producto.nombre}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Precio:</label>
+                            <input type="number" id="editProductoPrecio" step="0.01" value="${producto.precio}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Stock:</label>
+                            <input type="number" id="editProductoStock" value="${producto.stock}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Categoría:</label>
+                            <select id="editProductoCategoria" required>
+                                <option value="">Seleccione una categoría</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Proveedor:</label>
+                            <select id="editProductoProveedor">
+                                <option value="">Seleccione un proveedor (opcional)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-success">Actualizar</button>
+                    </form>
+                `;
+                document.getElementById('editModal').classList.add('active');
+                
+                // Load categorias and proveedores for selects
+                const categorias = await apiRequest(`${API_BASE}/categorias/`);
+                const proveedores = await apiRequest(`${API_BASE}/proveedores`);
+                
+                document.getElementById('editProductoCategoria').innerHTML = 
+                    '<option value="">Seleccione una categoría</option>' +
+                    (categorias ? categorias.map(c => `<option value="${c.id}" ${c.id === producto.categoria_id ? 'selected' : ''}>${c.nombre}</option>`).join('') : '');
+                
+                document.getElementById('editProductoProveedor').innerHTML = 
+                    '<option value="">Seleccione un proveedor (opcional)</option>' +
+                    (proveedores ? proveedores.map(p => `<option value="${p.id}" ${p.id === producto.proveedor_id ? 'selected' : ''}>${p.nombre}</option>`).join('') : '');
+                
+                document.getElementById('editProductoForm').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const data = {
+                        nombre: document.getElementById('editProductoNombre').value,
+                        precio: parseFloat(document.getElementById('editProductoPrecio').value),
+                        stock: parseInt(document.getElementById('editProductoStock').value),
+                        categoria_id: parseInt(document.getElementById('editProductoCategoria').value),
+                        proveedor_id: document.getElementById('editProductoProveedor').value ? parseInt(document.getElementById('editProductoProveedor').value) : null
+                    };
+                    const result = await apiRequest(`${API_BASE}/productos/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    if (result) {
+                        showSuccess('Producto actualizado');
+                        closeModal();
+                        loadProductos();
+                    }
+                });
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+
+        // Load initial data
+        loadProveedores();
+    </script>
+</body>
+</html>
